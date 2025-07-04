@@ -28,6 +28,7 @@ import {
   BookCheck,
   Library,
   Bus,
+  DollarSign,
 } from 'lucide-react';
 
 const menuItems = [
@@ -42,6 +43,7 @@ const menuItems = [
   { href: '/results', label: 'Results', icon: BookCheck },
   { href: '/library', label: 'Library', icon: Library },
   { href: '/transport', label: 'Transport', icon: Bus },
+  { href: '/accounting', label: 'Accounting', icon: DollarSign },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },
 ];

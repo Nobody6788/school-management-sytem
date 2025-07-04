@@ -178,3 +178,20 @@ export const transport = {
     { id: 'TM03', memberId: 'S002', memberType: 'Student', routeId: 'R02' },
   ]
 };
+
+export const accounting = {
+  accountTypes: [
+    { id: 'AT01', name: 'Income' },
+    { id: 'AT02', name: 'Expense' },
+    { id: 'AT03', name: 'Asset' },
+    { id: 'AT04', name: 'Liability' },
+  ],
+  accountTitles: [
+    { id: 'ATL01', name: 'Student Admission Fees', typeId: 'AT01' },
+    { id: 'ATL02', name: 'Monthly Tuition Fees', typeId: 'AT01' },
+    { id: 'ATL03', name: 'Teacher Salaries', typeId: 'AT02' },
+    { id: 'ATL04', name: 'Utilities', typeId: 'AT02' },
+    { id: 'ATL05', name: 'School Building', typeId: 'AT03' },
+    { id: 'ATL06', name: 'Bank Loans', typeId: 'AT04' },
+  ],
+};
