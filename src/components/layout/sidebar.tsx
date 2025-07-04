@@ -23,6 +23,7 @@ import {
   Megaphone,
   Contact,
   GraduationCap,
+  ClipboardCheck,
 } from 'lucide-react';
 
 const menuItems = [
@@ -32,6 +33,7 @@ const menuItems = [
   { href: '/parents', label: 'Parents', icon: Contact },
   { href: '/schedule', label: 'Schedule', icon: CalendarDays },
   { href: '/attendance', label: 'Attendance', icon: UserCheck },
+  { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
   { href: '/grades', label: 'Grades', icon: GraduationCap },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },

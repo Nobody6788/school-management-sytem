@@ -108,6 +108,12 @@ export const academic = {
     { id: 'ER02', examId: 'EXM01', classId: 'C01', subjectId: 'SUB02', date: '2024-12-02', startTime: '09:00', endTime: '12:00', room: '201' },
     { id: 'ER03', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', date: '2024-12-01', startTime: '09:00', endTime: '12:00', room: '202' },
     { id: 'ER04', examId: 'EXM02', classId: 'C03', subjectId: 'SUB06', date: '2025-05-20', startTime: '09:00', endTime: '12:00', room: '301' },
+  ],
+  examAttendances: [
+    { id: 'EA01', examId: 'EXM01', classId: 'C01', subjectId: 'SUB01', totalStudents: 40, present: 38, absent: 2 },
+    { id: 'EA02', examId: 'EXM01', classId: 'C01', subjectId: 'SUB02', totalStudents: 40, present: 39, absent: 1 },
+    { id: 'EA03', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', totalStudents: 40, present: 35, absent: 5 },
+    { id: 'EA04', examId: 'EXM02', classId: 'C03', subjectId: 'SUB06', totalStudents: 35, present: 34, absent: 1 },
   ]
 };
 
