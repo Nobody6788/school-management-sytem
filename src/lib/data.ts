@@ -27,6 +27,14 @@ export const teachers = [
     { id: 'T05', name: 'Ms. Chloe Garcia', specialization: 'English Literature', email: 'chloe.garcia@example.com' },
 ];
 
+export const parents = [
+    { id: 'P01', name: 'David Martin', email: 'david.martin@example.com', phone: '555-0101', studentId: 'S001' },
+    { id: 'P02', name: 'Robert Lee', email: 'robert.lee@example.com', phone: '555-0102', studentId: 'S002' },
+    { id: 'P03', name: 'Maria Nguyen', email: 'maria.nguyen@example.com', phone: '555-0103', studentId: 'S003' },
+    { id: 'P04', name: 'James Kim', email: 'james.kim@example.com', phone: '555-0104', studentId: 'S004' },
+    { id: 'P05', name: 'Linda Rodriguez', email: 'linda.rodriguez@example.com', phone: '555-0105', studentId: 'S005' },
+];
+
 export const schedule = {
     'Grade 9': [
         { time: '08:00 - 09:00', monday: 'Math', tuesday: 'Science', wednesday: 'Math', thursday: 'Science', friday: 'English' },

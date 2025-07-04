@@ -21,12 +21,14 @@ import {
   Shield,
   UserCheck,
   Megaphone,
+  Contact,
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/students', label: 'Students', icon: Users },
   { href: '/teachers', label: 'Teachers', icon: BookUser },
+  { href: '/parents', label: 'Parents', icon: Contact },
   { href: '/schedule', label: 'Schedule', icon: CalendarDays },
   { href: '/attendance', label: 'Attendance', icon: UserCheck },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
