@@ -39,6 +39,18 @@ export const schedule = {
         { time: '09:00 - 10:00', monday: 'Algebra II', tuesday: 'World History', wednesday: 'Algebra II', thursday: 'World History', friday: 'Geography' },
         { time: '10:00 - 11:00', monday: 'Chemistry', tuesday: 'Algebra II', wednesday: 'Computer Sci.', thursday: 'Algebra II', friday: 'Physics' },
         { time: '11:00 - 12:00', monday: 'World History', tuesday: 'Physics', wednesday: 'World History', thursday: 'English Lit.', friday: 'Study Hall' },
+    ],
+    'Grade 11': [
+        { time: '08:00 - 09:00', monday: 'Calculus', tuesday: 'US History', wednesday: 'Calculus', thursday: 'US History', friday: 'Physics' },
+        { time: '09:00 - 10:00', monday: 'English Lit.', tuesday: 'Physics', wednesday: 'English Lit.', thursday: 'Physics', friday: 'Chemistry' },
+        { time: '10:00 - 11:00', monday: 'US History', tuesday: 'Calculus', wednesday: 'Spanish III', thursday: 'Calculus', friday: 'US History' },
+        { time: '11:00 - 12:00', monday: 'Chemistry', tuesday: 'English Lit.', wednesday: 'Chemistry', thursday: 'English Lit.', friday: 'Art History' },
+    ],
+    'Grade 12': [
+        { time: '08:00 - 09:00', monday: 'Gov & Econ', tuesday: 'Statistics', wednesday: 'Gov & Econ', thursday: 'Statistics', friday: 'Creative Writing' },
+        { time: '09:00 - 10:00', monday: 'Statistics', tuesday: 'British Lit.', wednesday: 'Statistics', thursday: 'British Lit.', friday: 'Gov & Econ' },
+        { time: '10:00 - 11:00', monday: 'AP Biology', tuesday: 'Gov & Econ', wednesday: 'AP Biology', thursday: 'Gov & Econ', friday: 'Elective' },
+        { time: '11:00 - 12:00', monday: 'British Lit.', tuesday: 'AP Biology', wednesday: 'British Lit.', thursday: 'AP Biology', friday: 'Yearbook' },
     ]
 };
 
