@@ -29,16 +29,24 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -51,320 +59,382 @@ import {
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import { academic } from '@/lib/data';
 
+type Class = (typeof academic.classes)[0];
+type Section = (typeof academic.sections)[0];
+type Group = (typeof academic.groups)[0];
+
 export default function AdminPage() {
   const [classes, setClasses] = useState(academic.classes);
   const [sections, setSections] = useState(academic.sections);
   const [groups, setGroups] = useState(academic.groups);
 
-  // For dialogs to close themselves after submission
-  const [isClassDialogOpen, setClassDialogOpen] = useState(false);
-  const [isSectionDialogOpen, setSectionDialogOpen] = useState(false);
-  const [isGroupDialogOpen, setGroupDialogOpen] = useState(false);
+  // Modal states for Add/Edit
+  const [isClassModalOpen, setClassModalOpen] = useState(false);
+  const [isSectionModalOpen, setSectionModalOpen] = useState(false);
+  const [isGroupModalOpen, setGroupModalOpen] = useState(false);
 
-  const handleAddClass = (event: React.FormEvent<HTMLFormElement>) => {
+  // State for item being edited
+  const [editingClass, setEditingClass] = useState<Class | null>(null);
+  const [editingSection, setEditingSection] = useState<Section | null>(null);
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+
+  // State for delete confirmation
+  const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: string } | null>(null);
+
+  // --- Handlers for Class ---
+  const handleOpenClassModal = (cls: Class | null) => {
+    setEditingClass(cls);
+    setClassModalOpen(true);
+  };
+
+  const handleClassSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
     const name = formData.get('name') as string;
     const capacity = parseInt(formData.get('capacity') as string, 10);
-    if (name) {
-      setClasses([
-        ...classes,
-        { id: `C${(classes.length + 1).toString().padStart(2, '0')}`, name, capacity },
-      ]);
-      form.reset();
-      setClassDialogOpen(false);
+
+    if (name && capacity) {
+      if (editingClass) {
+        setClasses(classes.map((c) => (c.id === editingClass.id ? { ...c, name, capacity } : c)));
+      } else {
+        setClasses([...classes, { id: `C${(classes.length + 1).toString().padStart(2, '0')}`, name, capacity }]);
+      }
+      setClassModalOpen(false);
     }
   };
 
-  const handleAddSection = (event: React.FormEvent<HTMLFormElement>) => {
+  // --- Handlers for Section ---
+  const handleOpenSectionModal = (sec: Section | null) => {
+    setEditingSection(sec);
+    setSectionModalOpen(true);
+  };
+
+  const handleSectionSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
     const name = formData.get('name') as string;
     const className = formData.get('className') as string;
     const capacity = parseInt(formData.get('capacity') as string, 10);
-    if (name && className) {
-      setSections([
-        ...sections,
-        { id: `S${(sections.length + 1).toString().padStart(2, '0')}`, name, className, capacity },
-      ]);
-      form.reset();
-      setSectionDialogOpen(false);
+
+    if (name && className && capacity) {
+      if (editingSection) {
+        setSections(sections.map((s) => (s.id === editingSection.id ? { ...s, name, className, capacity } : s)));
+      } else {
+        setSections([...sections, { id: `S${(sections.length + 1).toString().padStart(2, '0')}`, name, className, capacity }]);
+      }
+      setSectionModalOpen(false);
     }
   };
 
-  const handleAddGroup = (event: React.FormEvent<HTMLFormElement>) => {
+  // --- Handlers for Group ---
+  const handleOpenGroupModal = (grp: Group | null) => {
+    setEditingGroup(grp);
+    setGroupModalOpen(true);
+  };
+
+  const handleGroupSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
     const name = formData.get('name') as string;
+
     if (name) {
-      setGroups([
-        ...groups,
-        { id: `G${(groups.length + 1).toString().padStart(2, '0')}`, name },
-      ]);
-      form.reset();
-      setGroupDialogOpen(false);
+      if (editingGroup) {
+        setGroups(groups.map((g) => (g.id === editingGroup.id ? { ...g, name } : g)));
+      } else {
+        setGroups([...groups, { id: `G${(groups.length + 1).toString().padStart(2, '0')}`, name }]);
+      }
+      setGroupModalOpen(false);
     }
   };
 
+  // --- Handler for Deletion ---
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return;
+
+    switch (deleteTarget.type) {
+      case 'class':
+        setClasses(classes.filter((c) => c.id !== deleteTarget.id));
+        break;
+      case 'section':
+        setSections(sections.filter((s) => s.id !== deleteTarget.id));
+        break;
+      case 'group':
+        setGroups(groups.filter((g) => g.id !== deleteTarget.id));
+        break;
+    }
+    setDeleteTarget(null);
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Admin Panel</CardTitle>
-        <CardDescription>
-          Manage all aspects of the CampusFlow application from here.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="classes">
-          <TabsList>
-            <TabsTrigger value="classes">Classes</TabsTrigger>
-            <TabsTrigger value="sections">Sections</TabsTrigger>
-            <TabsTrigger value="groups">Groups</TabsTrigger>
-          </TabsList>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Admin Panel</CardTitle>
+          <CardDescription>
+            Manage all aspects of the CampusFlow application from here.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="classes">
+            <TabsList>
+              <TabsTrigger value="classes">Classes</TabsTrigger>
+              <TabsTrigger value="sections">Sections</TabsTrigger>
+              <TabsTrigger value="groups">Groups</TabsTrigger>
+            </TabsList>
 
-          {/* Classes Tab */}
-          <TabsContent value="classes">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Manage Classes</CardTitle>
-                  <Dialog open={isClassDialogOpen} onOpenChange={setClassDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="sm">
-                        <PlusCircle className="h-4 w-4 mr-2" />
-                        Add Class
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Class</DialogTitle>
-                      </DialogHeader>
-                      <form onSubmit={handleAddClass}>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
-                              Name
-                            </Label>
-                            <Input id="name" name="name" className="col-span-3" required />
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="capacity" className="text-right">
-                              Capacity
-                            </Label>
-                            <Input id="capacity" name="capacity" type="number" className="col-span-3" required />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button type="submit">Save Class</Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Class Name</TableHead>
-                      <TableHead>Capacity</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+            {/* Classes Tab */}
+            <TabsContent value="classes">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Manage Classes</CardTitle>
+                    <Button size="sm" onClick={() => handleOpenClassModal(null)}>
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Add Class
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Class Name</TableHead>
+                        <TableHead>Capacity</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {classes.map((c) => (
+                        <TableRow key={c.id}>
+                          <TableCell>{c.name}</TableCell>
+                          <TableCell>{c.capacity}</TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="ghost">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleOpenClassModal(c)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'class', id: c.id })}>Delete</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Sections Tab */}
+            <TabsContent value="sections">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Manage Sections</CardTitle>
+                    <Button size="sm" onClick={() => handleOpenSectionModal(null)}>
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Add Section
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Section Name</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead>Capacity</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sections.map((s) => (
+                        <TableRow key={s.id}>
+                          <TableCell>{s.name}</TableCell>
+                          <TableCell>{s.className}</TableCell>
+                          <TableCell>{s.capacity}</TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="ghost">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleOpenSectionModal(s)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'section', id: s.id })}>Delete</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Groups Tab */}
+            <TabsContent value="groups">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Manage Groups</CardTitle>
+                    <Button size="sm" onClick={() => handleOpenGroupModal(null)}>
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Add Group
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Group Name</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groups.map((g) => (
+                        <TableRow key={g.id}>
+                          <TableCell>{g.name}</TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="ghost">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleOpenGroupModal(g)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'group', id: g.id })}>Delete</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Class Modal */}
+      <Dialog open={isClassModalOpen} onOpenChange={setClassModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingClass ? 'Edit Class' : 'Add New Class'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleClassSubmit} key={editingClass ? editingClass.id : 'add-class'}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">Name</Label>
+                <Input id="name" name="name" className="col-span-3" required defaultValue={editingClass?.name} />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="capacity" className="text-right">Capacity</Label>
+                <Input id="capacity" name="capacity" type="number" className="col-span-3" required defaultValue={editingClass?.capacity} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setClassModalOpen(false)}>Cancel</Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Section Modal */}
+      <Dialog open={isSectionModalOpen} onOpenChange={setSectionModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingSection ? 'Edit Section' : 'Add New Section'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSectionSubmit} key={editingSection ? editingSection.id : 'add-section'}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">Name</Label>
+                <Input id="name" name="name" className="col-span-3" required defaultValue={editingSection?.name} />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="capacity" className="text-right">Capacity</Label>
+                <Input id="capacity" name="capacity" type="number" className="col-span-3" required defaultValue={editingSection?.capacity} />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="className" className="text-right">Class</Label>
+                <Select name="className" required defaultValue={editingSection?.className}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a class" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {classes.map((c) => (
-                      <TableRow key={c.id}>
-                        <TableCell>{c.name}</TableCell>
-                        <TableCell>{c.capacity}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                      <SelectItem key={c.id} value={c.name}>
+                        {c.name}
+                      </SelectItem>
                     ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setSectionModalOpen(false)}>Cancel</Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-          {/* Sections Tab */}
-          <TabsContent value="sections">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Manage Sections</CardTitle>
-                   <Dialog open={isSectionDialogOpen} onOpenChange={setSectionDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="sm">
-                        <PlusCircle className="h-4 w-4 mr-2" />
-                        Add Section
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Section</DialogTitle>
-                      </DialogHeader>
-                      <form onSubmit={handleAddSection}>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
-                              Name
-                            </Label>
-                            <Input id="name" name="name" className="col-span-3" required/>
-                          </div>
-                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="capacity" className="text-right">
-                              Capacity
-                            </Label>
-                            <Input id="capacity" name="capacity" type="number" className="col-span-3" required />
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="className" className="text-right">
-                              Class
-                            </Label>
-                            <Select name="className" required>
-                              <SelectTrigger className="col-span-3">
-                                <SelectValue placeholder="Select a class" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {classes.map((c) => (
-                                  <SelectItem key={c.id} value={c.name}>
-                                    {c.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button type="submit">Save Section</Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Section Name</TableHead>
-                      <TableHead>Class</TableHead>
-                      <TableHead>Capacity</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sections.map((s) => (
-                      <TableRow key={s.id}>
-                        <TableCell>{s.name}</TableCell>
-                        <TableCell>{s.className}</TableCell>
-                        <TableCell>{s.capacity}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Groups Tab */}
-          <TabsContent value="groups">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Manage Groups</CardTitle>
-                   <Dialog open={isGroupDialogOpen} onOpenChange={setGroupDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="sm">
-                        <PlusCircle className="h-4 w-4 mr-2" />
-                        Add Group
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Group</DialogTitle>
-                      </DialogHeader>
-                      <form onSubmit={handleAddGroup}>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
-                              Name
-                            </Label>
-                            <Input id="name" name="name" className="col-span-3" required/>
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button type="submit">Save Group</Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Group Name</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {groups.map((g) => (
-                      <TableRow key={g.id}>
-                        <TableCell>{g.name}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+      {/* Group Modal */}
+      <Dialog open={isGroupModalOpen} onOpenChange={setGroupModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingGroup ? 'Edit Group' : 'Add New Group'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleGroupSubmit} key={editingGroup ? editingGroup.id : 'add-group'}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">Name</Label>
+                <Input id="name" name="name" className="col-span-3" required defaultValue={editingGroup?.name} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setGroupModalOpen(false)}>Cancel</Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the selected item.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className={buttonVariants({ variant: "destructive" })}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
