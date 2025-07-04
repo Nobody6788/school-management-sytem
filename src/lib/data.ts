@@ -13,11 +13,11 @@ export const events = [
 ];
 
 export const students = [
-    { id: 'S001', name: 'Olivia Martin', grade: 10, email: 'olivia.martin@example.com' },
-    { id: 'S002', name: 'Jackson Lee', grade: 9, email: 'jackson.lee@example.com' },
-    { id: 'S003', name: 'Isabella Nguyen', grade: 11, email: 'isabella.nguyen@example.com' },
-    { id: 'S004', name: 'William Kim', grade: 12, email: 'william.kim@example.com' },
-    { id: 'S005', name: 'Sophia Rodriguez', grade: 10, email: 'sophia.rodriguez@example.com' },
+    { id: 'S001', name: 'Olivia Martin', grade: 'Grade 10', email: 'olivia.martin@example.com', section: 'Section A', dob: '2008-05-12', parentName: 'David Martin' },
+    { id: 'S002', name: 'Jackson Lee', grade: 'Grade 9', email: 'jackson.lee@example.com', section: 'Section B', dob: '2009-02-28', parentName: 'Robert Lee' },
+    { id: 'S003', name: 'Isabella Nguyen', grade: 'Grade 11', email: 'isabella.nguyen@example.com', section: 'Section A', dob: '2007-09-15', parentName: 'Maria Nguyen' },
+    { id: 'S004', name: 'William Kim', grade: 'Grade 12', email: 'william.kim@example.com', section: 'Section A', dob: '2006-11-23', parentName: 'James Kim' },
+    { id: 'S005', name: 'Sophia Rodriguez', grade: 'Grade 10', email: 'sophia.rodriguez@example.com', section: 'Section B', dob: '2008-07-30', parentName: 'Linda Rodriguez' },
 ];
 
 export const teachers = [
@@ -54,6 +54,9 @@ export const academic = {
     { id: 'S01', name: 'Section A', className: 'Grade 9', capacity: 40 },
     { id: 'S02', name: 'Section B', className: 'Grade 9', capacity: 40 },
     { id: 'S03', name: 'Section A', className: 'Grade 10', capacity: 40 },
+    { id: 'S04', name: 'Section B', className: 'Grade 10', capacity: 40 },
+    { id: 'S05', name: 'Section A', className: 'Grade 11', capacity: 35 },
+    { id: 'S06', name: 'Section A', className: 'Grade 12', capacity: 35 },
   ],
   groups: [
     { id: 'G01', name: 'Science Club' },
