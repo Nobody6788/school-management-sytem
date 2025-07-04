@@ -30,6 +30,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,6 +49,8 @@ type Student = (typeof students)[0];
 export default function StudentsPage() {
   const [studentsData, setStudentsData] = useState(students);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [isViewModalOpen, setViewModalOpen] = useState(false);
+  const [viewingStudent, setViewingStudent] = useState<Student | null>(null);
   const [selectedClass, setSelectedClass] = useState<string | undefined>();
 
   const handleAddStudent = (event: React.FormEvent<HTMLFormElement>) => {
@@ -71,10 +74,15 @@ export default function StudentsPage() {
     }
   };
   
-  const handleOpenModal = () => {
+  const handleOpenAddModal = () => {
     setSelectedClass(undefined);
     setAddModalOpen(true);
   }
+
+  const handleOpenViewModal = (student: Student) => {
+    setViewingStudent(student);
+    setViewModalOpen(true);
+  };
 
   const availableSections = academic.sections.filter(s => s.className === selectedClass);
 
@@ -87,7 +95,7 @@ export default function StudentsPage() {
               <CardTitle>Student Management</CardTitle>
               <CardDescription>View, add, and manage student profiles.</CardDescription>
             </div>
-            <Button size="sm" className="gap-1" onClick={handleOpenModal}>
+            <Button size="sm" className="gap-1" onClick={handleOpenAddModal}>
               <PlusCircle className="h-4 w-4" />
               Add Student
             </Button>
@@ -128,7 +136,7 @@ export default function StudentsPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenViewModal(student)}>View Details</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -200,6 +208,55 @@ export default function StudentsPage() {
               <Button type="submit">Add Student</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* View Student Details Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setViewModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Student Details</DialogTitle>
+            <DialogDescription>
+              Full information for {viewingStudent?.name}.
+            </DialogDescription>
+          </DialogHeader>
+          {viewingStudent && (
+            <div className="grid gap-4 py-4 text-sm">
+              <div className="grid grid-cols-3 gap-2">
+                <div className="font-semibold text-muted-foreground">Student ID</div>
+                <div className="col-span-2">{viewingStudent.id}</div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="font-semibold text-muted-foreground">Full Name</div>
+                <div className="col-span-2">{viewingStudent.name}</div>
+              </div>
+               <div className="grid grid-cols-3 gap-2">
+                <div className="font-semibold text-muted-foreground">Date of Birth</div>
+                <div className="col-span-2">{viewingStudent.dob}</div>
+              </div>
+               <div className="grid grid-cols-3 gap-2">
+                <div className="font-semibold text-muted-foreground">Class</div>
+                <div className="col-span-2">{viewingStudent.grade}</div>
+              </div>
+               <div className="grid grid-cols-3 gap-2">
+                <div className="font-semibold text-muted-foreground">Section</div>
+                <div className="col-span-2">{viewingStudent.section}</div>
+              </div>
+
+              <h3 className="font-semibold text-base mt-4 border-t pt-4">Parent Information</h3>
+               <div className="grid grid-cols-3 gap-2">
+                <div className="font-semibold text-muted-foreground">Parent's Name</div>
+                <div className="col-span-2">{viewingStudent.parentName}</div>
+              </div>
+               <div className="grid grid-cols-3 gap-2">
+                <div className="font-semibold text-muted-foreground">Contact Email</div>
+                <div className="col-span-2">{viewingStudent.email}</div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewModalOpen(false)}>Close</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
