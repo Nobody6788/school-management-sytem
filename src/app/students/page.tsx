@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -32,6 +32,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -49,8 +59,11 @@ type Student = (typeof students)[0];
 export default function StudentsPage() {
   const [studentsData, setStudentsData] = useState(students);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isViewModalOpen, setViewModalOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [viewingStudent, setViewingStudent] = useState<Student | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Student | null>(null);
   const [selectedClass, setSelectedClass] = useState<string | undefined>();
 
   const handleAddStudent = (event: React.FormEvent<HTMLFormElement>) => {
@@ -70,7 +83,6 @@ export default function StudentsPage() {
     if (newStudent.name && newStudent.email && newStudent.grade && newStudent.section && newStudent.dob && newStudent.parentName) {
       setStudentsData([...studentsData, newStudent]);
       setAddModalOpen(false);
-      setSelectedClass(undefined);
     }
   };
   
@@ -78,6 +90,39 @@ export default function StudentsPage() {
     setSelectedClass(undefined);
     setAddModalOpen(true);
   }
+
+  const handleOpenEditModal = (student: Student) => {
+    setEditingStudent(student);
+    setSelectedClass(student.grade);
+    setEditModalOpen(true);
+  };
+  
+  const handleEditStudent = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editingStudent) return;
+    
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const updatedStudent: Student = {
+      ...editingStudent,
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      grade: formData.get('grade') as string,
+      section: formData.get('section') as string,
+      dob: formData.get('dob') as string,
+      parentName: formData.get('parentName') as string,
+    };
+
+    setStudentsData(studentsData.map(s => s.id === editingStudent.id ? updatedStudent : s));
+    setEditModalOpen(false);
+    setEditingStudent(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return;
+    setStudentsData(studentsData.filter(s => s.id !== deleteTarget.id));
+    setDeleteTarget(null);
+  };
 
   const handleOpenViewModal = (student: Student) => {
     setViewingStudent(student);
@@ -93,7 +138,7 @@ export default function StudentsPage() {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Student Management</CardTitle>
-              <CardDescription>View, add, and manage student profiles.</CardDescription>
+              <CardDescription>View, add, edit, and manage student profiles.</CardDescription>
             </div>
             <Button size="sm" className="gap-1" onClick={handleOpenAddModal}>
               <PlusCircle className="h-4 w-4" />
@@ -135,9 +180,9 @@ export default function StudentsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenEditModal(student)}>Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleOpenViewModal(student)}>View Details</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(student)}>Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -211,6 +256,71 @@ export default function StudentsPage() {
         </DialogContent>
       </Dialog>
       
+      {/* Edit Student Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Student Information</DialogTitle>
+          </DialogHeader>
+          {editingStudent && (
+            <form onSubmit={handleEditStudent} key={editingStudent.id}>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name-edit" className="text-right">Name</Label>
+                  <Input id="name-edit" name="name" className="col-span-3" required defaultValue={editingStudent.name} />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email-edit" className="text-right">Email</Label>
+                  <Input id="email-edit" name="email" type="email" className="col-span-3" required defaultValue={editingStudent.email} />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="parentName-edit" className="text-right">Parent's Name</Label>
+                  <Input id="parentName-edit" name="parentName" className="col-span-3" required defaultValue={editingStudent.parentName} />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="dob-edit" className="text-right">Date of Birth</Label>
+                  <Input id="dob-edit" name="dob" type="date" className="col-span-3" required defaultValue={editingStudent.dob} />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="grade-edit" className="text-right">Class</Label>
+                  <Select name="grade" required onValueChange={setSelectedClass} defaultValue={editingStudent.grade}>
+                    <SelectTrigger id="grade-edit" className="col-span-3">
+                      <SelectValue placeholder="Select a class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {academic.classes.map((c) => (
+                        <SelectItem key={c.id} value={c.name}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="section-edit" className="text-right">Section</Label>
+                  <Select name="section" required disabled={!selectedClass} defaultValue={editingStudent.section}>
+                    <SelectTrigger id="section-edit" className="col-span-3">
+                      <SelectValue placeholder="Select section after class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableSections.map((s) => (
+                        <SelectItem key={s.id} value={s.name}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>Cancel</Button>
+                <Button type="submit">Save Changes</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+      
       {/* View Student Details Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setViewModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -259,6 +369,24 @@ export default function StudentsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this student's information.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className={buttonVariants({ variant: "destructive" })}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
