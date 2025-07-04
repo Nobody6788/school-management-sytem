@@ -100,11 +100,19 @@ export default function AdminPage() {
 
     if (name && capacity) {
       if (editingClass) {
+        const oldClassName = editingClass.name;
+        // Update class
         setClasses(classes.map((c) => (c.id === editingClass.id ? { ...c, name, capacity } : c)));
+        // Update associated sections and subjects if class name changed
+        if (oldClassName !== name) {
+          setSections(sections.map(s => s.className === oldClassName ? { ...s, className: name } : s));
+          setSubjects(subjects.map(s => s.className === oldClassName ? { ...s, className: name } : s));
+        }
       } else {
         setClasses([...classes, { id: `C${(classes.length + 1).toString().padStart(2, '0')}`, name, capacity }]);
       }
       setClassModalOpen(false);
+      setEditingClass(null);
     }
   };
 
@@ -129,6 +137,7 @@ export default function AdminPage() {
         setSections([...sections, { id: `S${(sections.length + 1).toString().padStart(2, '0')}`, name, className, capacity }]);
       }
       setSectionModalOpen(false);
+      setEditingSection(null);
     }
   };
 
@@ -151,6 +160,7 @@ export default function AdminPage() {
         setGroups([...groups, { id: `G${(groups.length + 1).toString().padStart(2, '0')}`, name }]);
       }
       setGroupModalOpen(false);
+      setEditingGroup(null);
     }
   };
 
@@ -174,6 +184,7 @@ export default function AdminPage() {
           setSubjects([...subjects, { id: `SUB${(subjects.length + 1).toString().padStart(2, '0')}`, name, className }]);
         }
         setSubjectModalOpen(false);
+        setEditingSubject(null);
       }
     };
 
@@ -183,6 +194,12 @@ export default function AdminPage() {
 
     switch (deleteTarget.type) {
       case 'class':
+        const classToDelete = classes.find(c => c.id === deleteTarget.id);
+        if (classToDelete) {
+          // Cascade delete to sections and subjects
+          setSections(sections.filter(s => s.className !== classToDelete.name));
+          setSubjects(subjects.filter(s => s.className !== classToDelete.name));
+        }
         setClasses(classes.filter((c) => c.id !== deleteTarget.id));
         break;
       case 'section':
@@ -539,7 +556,7 @@ export default function AdminPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the selected item.
+              This action cannot be undone. This will permanently delete the selected item and any associated sections or subjects.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
