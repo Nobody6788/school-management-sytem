@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -31,6 +31,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
@@ -41,6 +51,9 @@ type Teacher = (typeof teachers)[0];
 export default function TeachersPage() {
   const [teachersData, setTeachersData] = useState(teachers);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Teacher | null>(null);
 
   const handleAddTeacher = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,6 +72,39 @@ export default function TeachersPage() {
     }
   };
 
+  const handleOpenEditModal = (teacher: Teacher) => {
+    setEditingTeacher(teacher);
+    setEditModalOpen(true);
+  };
+
+  const handleEditTeacher = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editingTeacher) return;
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const updatedTeacher: Teacher = {
+      ...editingTeacher,
+      name: formData.get('name') as string,
+      specialization: formData.get('specialization') as string,
+      email: formData.get('email') as string,
+    };
+
+    setTeachersData(
+      teachersData.map((t) =>
+        t.id === editingTeacher.id ? updatedTeacher : t
+      )
+    );
+    setEditModalOpen(false);
+    setEditingTeacher(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return;
+    setTeachersData(teachersData.filter((t) => t.id !== deleteTarget.id));
+    setDeleteTarget(null);
+  };
+
   return (
     <>
       <Card>
@@ -67,7 +113,7 @@ export default function TeachersPage() {
             <div>
               <CardTitle>Teacher Management</CardTitle>
               <CardDescription>
-                View, add, and manage teacher profiles.
+                View, add, edit, and manage teacher profiles.
               </CardDescription>
             </div>
             <Button
@@ -114,9 +160,15 @@ export default function TeachersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>View Schedule</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem
+                          onClick={() => handleOpenEditModal(teacher)}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => setDeleteTarget(teacher)}
+                        >
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -183,6 +235,93 @@ export default function TeachersPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Teacher Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Teacher Information</DialogTitle>
+          </DialogHeader>
+          {editingTeacher && (
+            <form onSubmit={handleEditTeacher} key={editingTeacher.id}>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name-edit" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name-edit"
+                    name="name"
+                    className="col-span-3"
+                    required
+                    defaultValue={editingTeacher.name}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="specialization-edit" className="text-right">
+                    Specialization
+                  </Label>
+                  <Input
+                    id="specialization-edit"
+                    name="specialization"
+                    className="col-span-3"
+                    required
+                    defaultValue={editingTeacher.specialization}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email-edit" className="text-right">
+                    Email
+                  </Label>
+                  <Input
+                    id="email-edit"
+                    name="email"
+                    type="email"
+                    className="col-span-3"
+                    required
+                    defaultValue={editingTeacher.email}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Save Changes</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              teacher's information.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className={buttonVariants({ variant: 'destructive' })}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
