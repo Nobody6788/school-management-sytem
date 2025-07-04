@@ -74,6 +74,14 @@ export const academic = {
     { id: 'G02', name: 'Debate Team' },
     { id: 'G03', name: 'Basketball Team' },
   ],
+  subjects: [
+    { id: 'SUB01', name: 'Mathematics', className: 'Grade 9' },
+    { id: 'SUB02', name: 'Science', className: 'Grade 9' },
+    { id: 'SUB03', name: 'English', className: 'Grade 9' },
+    { id: 'SUB04', name: 'Physics', className: 'Grade 10' },
+    { id: 'SUB05', name: 'World History', className: 'Grade 10' },
+    { id: 'SUB06', name: 'Calculus', className: 'Grade 11' },
+  ],
 };
 
 export const attendanceData = {

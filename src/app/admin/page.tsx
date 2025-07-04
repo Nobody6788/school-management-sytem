@@ -62,21 +62,25 @@ import { academic } from '@/lib/data';
 type Class = (typeof academic.classes)[0];
 type Section = (typeof academic.sections)[0];
 type Group = (typeof academic.groups)[0];
+type Subject = (typeof academic.subjects)[0];
 
 export default function AdminPage() {
   const [classes, setClasses] = useState(academic.classes);
   const [sections, setSections] = useState(academic.sections);
   const [groups, setGroups] = useState(academic.groups);
+  const [subjects, setSubjects] = useState(academic.subjects);
 
   // Modal states for Add/Edit
   const [isClassModalOpen, setClassModalOpen] = useState(false);
   const [isSectionModalOpen, setSectionModalOpen] = useState(false);
   const [isGroupModalOpen, setGroupModalOpen] = useState(false);
+  const [isSubjectModalOpen, setSubjectModalOpen] = useState(false);
 
   // State for item being edited
   const [editingClass, setEditingClass] = useState<Class | null>(null);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
 
   // State for delete confirmation
   const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: string } | null>(null);
@@ -150,6 +154,29 @@ export default function AdminPage() {
     }
   };
 
+    // --- Handlers for Subject ---
+    const handleOpenSubjectModal = (sub: Subject | null) => {
+      setEditingSubject(sub);
+      setSubjectModalOpen(true);
+    };
+  
+    const handleSubjectSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const name = formData.get('name') as string;
+      const className = formData.get('className') as string;
+  
+      if (name && className) {
+        if (editingSubject) {
+          setSubjects(subjects.map((s) => (s.id === editingSubject.id ? { ...s, name, className } : s)));
+        } else {
+          setSubjects([...subjects, { id: `SUB${(subjects.length + 1).toString().padStart(2, '0')}`, name, className }]);
+        }
+        setSubjectModalOpen(false);
+      }
+    };
+
   // --- Handler for Deletion ---
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return;
@@ -163,6 +190,9 @@ export default function AdminPage() {
         break;
       case 'group':
         setGroups(groups.filter((g) => g.id !== deleteTarget.id));
+        break;
+      case 'subject':
+        setSubjects(subjects.filter((s) => s.id !== deleteTarget.id));
         break;
     }
     setDeleteTarget(null);
@@ -183,6 +213,7 @@ export default function AdminPage() {
               <TabsTrigger value="classes">Classes</TabsTrigger>
               <TabsTrigger value="sections">Sections</TabsTrigger>
               <TabsTrigger value="groups">Groups</TabsTrigger>
+              <TabsTrigger value="subjects">Subjects</TabsTrigger>
             </TabsList>
 
             {/* Classes Tab */}
@@ -328,6 +359,54 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </TabsContent>
+            
+            {/* Subjects Tab */}
+            <TabsContent value="subjects">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Manage Subjects</CardTitle>
+                    <Button size="sm" onClick={() => handleOpenSubjectModal(null)}>
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Add Subject
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Subject Name</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {subjects.map((s) => (
+                        <TableRow key={s.id}>
+                          <TableCell>{s.name}</TableCell>
+                          <TableCell>{s.className}</TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="ghost">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleOpenSubjectModal(s)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'subject', id: s.id })}>Delete</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
@@ -418,6 +497,42 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
       
+      {/* Subject Modal */}
+      <Dialog open={isSubjectModalOpen} onOpenChange={setSubjectModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingSubject ? 'Edit Subject' : 'Add New Subject'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubjectSubmit} key={editingSubject ? editingSubject.id : 'add-subject'}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">Name</Label>
+                <Input id="name" name="name" className="col-span-3" required defaultValue={editingSubject?.name} />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="className" className="text-right">Class</Label>
+                <Select name="className" required defaultValue={editingSubject?.className}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classes.map((c) => (
+                      <SelectItem key={c.id} value={c.name}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setSubjectModalOpen(false)}>Cancel</Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
