@@ -121,8 +121,8 @@ export const academic = {
     { id: 'RES01', studentId: 'S001', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', marks: 85, status: 'Pending', submittedBy: 'T02' },
     { id: 'RES02', studentId: 'S005', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', marks: 92, status: 'Pending', submittedBy: 'T02' },
     { id: 'RES03', studentId: 'S002', examId: 'EXM01', classId: 'C01', subjectId: 'SUB01', marks: 78, status: 'Approved', submittedBy: 'T01' },
-    { id: 'RES04', studentId: 'S003', examId: 'EXM02', classId: 'C03', subjectId: 'SUB06', marks: 88, status: 'Pending', submittedBy: 'T01' },
-    { id: 'RES05', studentId: 'S001', examId: 'EXM01', classId: 'C02', subjectId: 'SUB05', marks: 76, status: 'Approved', submittedBy: 'T04' },
+    { id: 'RES04', studentId: 'S003', examId: 'EXM02', classId: 'C03', subjectId: 'SUB06', marks: 88, status: 'Published', submittedBy: 'T01' },
+    { id: 'RES05', studentId: 'S001', examId: 'EXM01', classId: 'C02', subjectId: 'SUB05', marks: 76, status: 'Published', submittedBy: 'T04' },
     { id: 'RES06', studentId: 'S004', examId: 'EXM02', classId: 'C04', subjectId: 'SUB07', marks: 65, status: 'Pending', submittedBy: 'T05' },
   ],
 };
@@ -193,5 +193,12 @@ export const accounting = {
     { id: 'ATL04', name: 'Utilities', typeId: 'AT02' },
     { id: 'ATL05', name: 'School Building', typeId: 'AT03' },
     { id: 'ATL06', name: 'Bank Loans', typeId: 'AT04' },
+    { id: 'ATL07', name: 'Library Fines', typeId: 'AT01' },
+    { id: 'ATL08', name: 'Transport Fees', typeId: 'AT01' },
   ],
+  transactions: [
+    { id: 'TRN001', studentId: 'S001', accountTitleId: 'ATL02', date: '2024-10-05', amount: 500, description: 'Tuition Fee for October', status: 'Paid' },
+    { id: 'TRN002', studentId: 'S002', accountTitleId: 'ATL02', date: '2024-10-05', amount: 500, description: 'Tuition Fee for October', status: 'Paid' },
+    { id: 'TRN003', studentId: 'S003', accountTitleId: 'ATL01', date: '2024-09-01', amount: 1000, description: 'Admission Fee', status: 'Paid' },
+  ]
 };
