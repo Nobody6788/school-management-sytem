@@ -1,3 +1,4 @@
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -141,5 +142,23 @@ export const attendanceData = {
     { date: 'Wed', attendance: 92 },
     { date: 'Thu', attendance: 91 },
     { date: 'Fri', attendance: 92.5 },
+  ],
+};
+
+export const library = {
+  bookCategories: [
+    { id: 'BC01', name: 'Science Fiction' },
+    { id: 'BC02', name: 'History' },
+    { id: 'BC03', name: 'Mathematics' },
+    { id: 'BC04', name: 'Literature' },
+    { id: 'BC05', name: 'Computer Science' },
+  ],
+  books: [
+    { id: 'B001', title: 'Dune', author: 'Frank Herbert', categoryId: 'BC01', quantity: 5 },
+    { id: 'B002', title: 'A Brief History of Time', author: 'Stephen Hawking', categoryId: 'BC02', quantity: 3 },
+    { id: 'B003', title: 'Calculus: A Modern Approach', author: 'Karl Menger', categoryId: 'BC03', quantity: 10 },
+    { id: 'B004', title: 'To Kill a Mockingbird', author: 'Harper Lee', categoryId: 'BC04', quantity: 7 },
+    { id: 'B005', title: 'The Pragmatic Programmer', author: 'Andrew Hunt', categoryId: 'BC05', quantity: 8 },
+    { id: 'B006', title: 'Foundation', author: 'Isaac Asimov', categoryId: 'BC01', quantity: 4 },
   ],
 };

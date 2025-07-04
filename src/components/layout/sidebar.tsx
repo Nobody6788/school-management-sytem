@@ -1,3 +1,4 @@
+
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -25,6 +26,7 @@ import {
   GraduationCap,
   ClipboardCheck,
   BookCheck,
+  Library,
 } from 'lucide-react';
 
 const menuItems = [
@@ -37,6 +39,7 @@ const menuItems = [
   { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
   { href: '/grades', label: 'Grades', icon: GraduationCap },
   { href: '/results', label: 'Results', icon: BookCheck },
+  { href: '/library', label: 'Library', icon: Library },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },
 ];
