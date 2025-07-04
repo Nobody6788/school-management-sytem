@@ -18,6 +18,7 @@ import {
   CalendarDays,
   School,
   LogOut,
+  Shield,
 } from 'lucide-react';
 
 const menuItems = [
@@ -25,6 +26,7 @@ const menuItems = [
   { href: '/students', label: 'Students', icon: Users },
   { href: '/teachers', label: 'Teachers', icon: BookUser },
   { href: '/schedule', label: 'Schedule', icon: CalendarDays },
+  { href: '/admin', label: 'Admin', icon: Shield },
 ];
 
 export function AppSidebar() {
