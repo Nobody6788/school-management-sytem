@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -34,7 +35,7 @@ import { SidebarTrigger } from '../ui/sidebar';
 
 export function AppHeader() {
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 print:hidden">
       <SidebarTrigger className="h-6 w-6" />
       <div className="w-full flex-1">
         {/* Can add a search bar here if needed */}

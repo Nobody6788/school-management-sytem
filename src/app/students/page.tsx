@@ -1,6 +1,8 @@
+
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -51,7 +53,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, FileText } from 'lucide-react';
 import { students, academic } from '@/lib/data';
 
 type Student = (typeof students)[0];
@@ -182,6 +184,12 @@ export default function StudentsPage() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleOpenEditModal(student)}>Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleOpenViewModal(student)}>View Details</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/students/${student.id}/marksheet`}>
+                            <FileText />
+                            <span>View Mark Sheet</span>
+                          </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(student)}>Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
