@@ -98,6 +98,11 @@ export default function AdminPage() {
   // State for delete confirmation
   const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: string } | null>(null);
 
+  // State for routine filters
+  const [selectedClassFilter, setSelectedClassFilter] = useState<string>('all');
+  const [selectedExamFilter, setSelectedExamFilter] = useState<string>('all');
+
+
   // --- Helper functions ---
   const getExamName = (examId: string) => exams.find(e => e.id === examId)?.name || 'N/A';
   const getClassName = (classId: string) => classes.find(c => c.id === classId)?.name || 'N/A';
@@ -107,6 +112,11 @@ export default function AdminPage() {
   ? subjects.filter(s => s.className === getClassName(selectedClassForRoutine))
   : [];
 
+  const filteredExamRoutines = examRoutines.filter(routine => {
+    const classMatch = selectedClassFilter === 'all' || routine.classId === selectedClassFilter;
+    const examMatch = selectedExamFilter === 'all' || routine.examId === selectedExamFilter;
+    return classMatch && examMatch;
+  });
 
   // --- Handlers for Class ---
   const handleOpenClassModal = (cls: Class | null) => {
@@ -578,6 +588,30 @@ export default function AdminPage() {
                                                 Add Routine
                                             </Button>
                                         </div>
+                                        <div className="flex items-center gap-2 pt-4">
+                                            <Select value={selectedExamFilter} onValueChange={setSelectedExamFilter}>
+                                                <SelectTrigger className="w-[220px]">
+                                                    <SelectValue placeholder="Filter by exam" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">All Exams</SelectItem>
+                                                    {exams.map((e) => (
+                                                        <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <Select value={selectedClassFilter} onValueChange={setSelectedClassFilter}>
+                                                <SelectTrigger className="w-[220px]">
+                                                    <SelectValue placeholder="Filter by class" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">All Classes</SelectItem>
+                                                    {classes.map((c) => (
+                                                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     </CardHeader>
                                     <CardContent>
                                         <Table>
@@ -593,30 +627,38 @@ export default function AdminPage() {
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {examRoutines.map((r) => (
-                                                    <TableRow key={r.id}>
-                                                        <TableCell>{getExamName(r.examId)}</TableCell>
-                                                        <TableCell>{getClassName(r.classId)}</TableCell>
-                                                        <TableCell>{getSubjectName(r.subjectId)}</TableCell>
-                                                        <TableCell>{r.date}</TableCell>
-                                                        <TableCell>{r.startTime} - {r.endTime}</TableCell>
-                                                        <TableCell>{r.room}</TableCell>
-                                                        <TableCell className="text-right">
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger asChild>
-                                                                    <Button size="icon" variant="ghost">
-                                                                        <MoreHorizontal className="h-4 w-4" />
-                                                                    </Button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent>
-                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                                    <DropdownMenuItem onClick={() => handleOpenRoutineModal(r)}>Edit</DropdownMenuItem>
-                                                                    <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'examRoutine', id: r.id })}>Delete</DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
+                                                {filteredExamRoutines.length > 0 ? (
+                                                    filteredExamRoutines.map((r) => (
+                                                        <TableRow key={r.id}>
+                                                            <TableCell>{getExamName(r.examId)}</TableCell>
+                                                            <TableCell>{getClassName(r.classId)}</TableCell>
+                                                            <TableCell>{getSubjectName(r.subjectId)}</TableCell>
+                                                            <TableCell>{r.date}</TableCell>
+                                                            <TableCell>{r.startTime} - {r.endTime}</TableCell>
+                                                            <TableCell>{r.room}</TableCell>
+                                                            <TableCell className="text-right">
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger asChild>
+                                                                        <Button size="icon" variant="ghost">
+                                                                            <MoreHorizontal className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent>
+                                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                        <DropdownMenuItem onClick={() => handleOpenRoutineModal(r)}>Edit</DropdownMenuItem>
+                                                                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'examRoutine', id: r.id })}>Delete</DropdownMenuItem>
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell colSpan={7} className="text-center">
+                                                            No exam routines found for the selected filters.
                                                         </TableCell>
                                                     </TableRow>
-                                                ))}
+                                                )}
                                             </TableBody>
                                         </Table>
                                     </CardContent>
