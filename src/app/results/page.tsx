@@ -76,31 +76,56 @@ export default function ResultsPage() {
   };
 
   const handlePublishResults = () => {
-    const hasApprovedResults = resultsData.some(result => 
-        result.classId === selectedClassFilter &&
-        result.examId === selectedExamFilter &&
-        result.status === 'Approved'
-    );
+    // Determine the scope of results to check for approved status
+    const resultsToConsider = resultsData.filter(result => {
+        const examMatch = selectedExamFilter === 'all' || result.examId === selectedExamFilter;
+        const classMatch = selectedClassFilter === 'all' || result.classId === selectedClassFilter;
+        return examMatch && classMatch;
+    });
+
+    const hasApprovedResults = resultsToConsider.some(result => result.status === 'Approved');
 
     if (!hasApprovedResults) {
+        let description = "No approved results found";
+        if (selectedExamFilter !== 'all') {
+            description += ` for ${getExamName(selectedExamFilter)}`;
+            if (selectedClassFilter !== 'all') {
+                description += ` in ${getClassName(selectedClassFilter)}`;
+            }
+        }
+        description += " to publish.";
+        
         toast({
             variant: "destructive",
             title: "Publishing Failed",
-            description: "No approved results found for the selected class and exam to publish.",
+            description,
         });
         setPublishDialogOpen(false);
         return;
     }
 
-    setResultsData(resultsData.map(result =>
-      result.classId === selectedClassFilter && result.examId === selectedExamFilter && result.status === 'Approved'
-        ? { ...result, status: 'Published' }
-        : result
-    ));
+    // Update the status of the relevant results
+    setResultsData(resultsData.map(result => {
+        const examMatch = selectedExamFilter === 'all' || result.examId === selectedExamFilter;
+        const classMatch = selectedClassFilter === 'all' || result.classId === selectedClassFilter;
+        
+        if (examMatch && classMatch && result.status === 'Approved') {
+            return { ...result, status: 'Published' };
+        }
+        return result;
+    }));
+
+    // Generate a descriptive toast message
+    let toastDescription = `Results for ${getExamName(selectedExamFilter)}`;
+    if (selectedClassFilter === 'all') {
+        toastDescription += " for all classes have been published.";
+    } else {
+        toastDescription += ` for ${getClassName(selectedClassFilter)} have been published.`;
+    }
 
     toast({
-      title: "Results Published!",
-      description: `Results for ${getClassName(selectedClassFilter)} - ${getExamName(selectedExamFilter)} have been published.`,
+        title: "Results Published!",
+        description: toastDescription,
     });
 
     setPublishDialogOpen(false);
@@ -159,7 +184,7 @@ export default function ResultsPage() {
             </div>
             <Button
               onClick={() => setPublishDialogOpen(true)}
-              disabled={selectedClassFilter === 'all' || selectedExamFilter === 'all'}
+              disabled={selectedExamFilter === 'all'}
             >
               <Megaphone className="mr-2 h-4 w-4" />
               Publish Results
@@ -225,7 +250,7 @@ export default function ResultsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to publish the results?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action will publish all approved results for the selected class and exam. 
+              This action will publish all approved results for the selected exam and class scope. 
               Once published, this action cannot be easily undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
