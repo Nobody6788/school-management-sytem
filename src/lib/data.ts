@@ -162,3 +162,19 @@ export const library = {
     { id: 'B006', title: 'Foundation', author: 'Isaac Asimov', categoryId: 'BC01', quantity: 4 },
   ],
 };
+
+export const transport = {
+  vehicles: [
+    { id: 'V01', vehicleNumber: 'BUS-001', model: 'Tata Starbus', year: '2022', capacity: 40, driverName: 'John Doe', driverContact: '555-1234' },
+    { id: 'V02', vehicleNumber: 'BUS-002', model: 'Ashok Leyland', year: '2021', capacity: 40, driverName: 'Peter Jones', driverContact: '555-5678' },
+  ],
+  routes: [
+    { id: 'R01', name: 'Downtown Route', stops: 'Central Park, City Library, Main Street, School', vehicleId: 'V01' },
+    { id: 'R02', name: 'Uptown Route', stops: 'North Suburbs, Green Valley, West End, School', vehicleId: 'V02' },
+  ],
+  members: [
+    { id: 'TM01', memberId: 'S001', memberType: 'Student', routeId: 'R01' },
+    { id: 'TM02', memberId: 'T01', memberType: 'Teacher', routeId: 'R02' },
+    { id: 'TM03', memberId: 'S002', memberType: 'Student', routeId: 'R02' },
+  ]
+};

@@ -27,6 +27,7 @@ import {
   ClipboardCheck,
   BookCheck,
   Library,
+  Bus,
 } from 'lucide-react';
 
 const menuItems = [
@@ -40,6 +41,7 @@ const menuItems = [
   { href: '/grades', label: 'Grades', icon: GraduationCap },
   { href: '/results', label: 'Results', icon: BookCheck },
   { href: '/library', label: 'Library', icon: Library },
+  { href: '/transport', label: 'Transport', icon: Bus },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },
 ];
