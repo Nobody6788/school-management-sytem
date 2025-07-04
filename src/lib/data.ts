@@ -90,6 +90,15 @@ export const academic = {
     { id: 'SUB05', name: 'World History', className: 'Grade 10' },
     { id: 'SUB06', name: 'Calculus', className: 'Grade 11' },
   ],
+  grades: [
+    { id: 'GR01', gradeName: 'A+', gradePoint: '5.0', percentageFrom: 80, percentageTo: 100 },
+    { id: 'GR02', gradeName: 'A', gradePoint: '4.0', percentageFrom: 70, percentageTo: 79 },
+    { id: 'GR03', gradeName: 'A-', gradePoint: '3.5', percentageFrom: 60, percentageTo: 69 },
+    { id: 'GR04', gradeName: 'B', gradePoint: '3.0', percentageFrom: 50, percentageTo: 59 },
+    { id: 'GR05', gradeName: 'C', gradePoint: '2.0', percentageFrom: 40, percentageTo: 49 },
+    { id: 'GR06', gradeName: 'D', gradePoint: '1.0', percentageFrom: 33, percentageTo: 39 },
+    { id: 'GR07', gradeName: 'F', gradePoint: '0.0', percentageFrom: 0, percentageTo: 32 },
+  ],
 };
 
 export const attendanceData = {
