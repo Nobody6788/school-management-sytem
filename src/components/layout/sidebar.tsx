@@ -19,6 +19,7 @@ import {
   School,
   LogOut,
   Shield,
+  UserCheck,
 } from 'lucide-react';
 
 const menuItems = [
@@ -26,6 +27,7 @@ const menuItems = [
   { href: '/students', label: 'Students', icon: Users },
   { href: '/teachers', label: 'Teachers', icon: BookUser },
   { href: '/schedule', label: 'Schedule', icon: CalendarDays },
+  { href: '/attendance', label: 'Attendance', icon: UserCheck },
   { href: '/admin', label: 'Admin', icon: Shield },
 ];
 

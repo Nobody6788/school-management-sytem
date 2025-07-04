@@ -2,7 +2,6 @@ export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
   classesToday: 112,
-  attendanceRate: '92.5%',
 };
 
 export const events = [
@@ -62,5 +61,22 @@ export const academic = {
     { id: 'G01', name: 'Science Club' },
     { id: 'G02', name: 'Debate Team' },
     { id: 'G03', name: 'Basketball Team' },
+  ],
+};
+
+export const attendanceData = {
+  overallPercentage: 92.5,
+  byGrade: [
+    { grade: 'Grade 9', percentage: 95.2 },
+    { grade: 'Grade 10', percentage: 91.8 },
+    { grade: 'Grade 11', percentage: 93.1 },
+    { grade: 'Grade 12', percentage: 89.9 },
+  ],
+  trend: [
+    { date: 'Mon', attendance: 93 },
+    { date: 'Tue', attendance: 94 },
+    { date: 'Wed', attendance: 92 },
+    { date: 'Thu', attendance: 91 },
+    { date: 'Fri', attendance: 92.5 },
   ],
 };
