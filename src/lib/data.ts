@@ -4,11 +4,11 @@ export const stats = {
   classesToday: 112,
 };
 
-export const events = [
-  { id: 1, name: 'Annual Sports Day', date: '2024-10-15', type: 'Sports' },
-  { id: 2, name: 'Science Fair', date: '2024-11-05', type: 'Academic' },
-  { id: 3, name: 'Parent-Teacher Conference', date: '2024-11-20', type: 'General' },
-  { id: 4, name: 'Winter Break Begins', date: '2024-12-22', type: 'Holiday' },
+export const notices = [
+  { id: 'N01', title: 'Annual Sports Day Postponed', content: 'The Annual Sports Day scheduled for October 15th has been postponed due to bad weather. A new date will be announced soon.', date: '2024-10-10', author: 'Admin' },
+  { id: 'N02', title: 'Science Fair Registration Open', content: 'Registrations for the Annual Science Fair are now open. Last date to register is November 1st.', date: '2024-10-05', author: 'Admin' },
+  { id: 'N03', title: 'Parent-Teacher Conference', content: 'The quarterly Parent-Teacher Conference will be held on November 20th. Please book your slots.', date: '2024-10-01', author: 'Admin' },
+  { id: 'N04', title: 'Winter Break Schedule', content: 'Winter break will commence from December 22nd, 2024.', date: '2024-09-28', author: 'Admin' },
 ];
 
 export const students = [

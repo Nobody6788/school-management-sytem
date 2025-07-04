@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Users, BookUser, CalendarClock } from 'lucide-react';
-import { events, stats } from '@/lib/data';
+import { notices, stats } from '@/lib/data';
 
 export default function Dashboard() {
   return (
@@ -42,35 +42,23 @@ export default function Dashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Upcoming Events</CardTitle>
+          <CardTitle>Recent Notices</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Event</TableHead>
+                <TableHead>Title</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead className="text-right">Type</TableHead>
+                <TableHead className="text-right">Author</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {events.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">{event.name}</TableCell>
-                  <TableCell>{event.date}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge
-                      variant={
-                        event.type === 'Academic'
-                          ? 'default'
-                          : event.type === 'Sports'
-                          ? 'secondary'
-                          : 'outline'
-                      }
-                    >
-                      {event.type}
-                    </Badge>
-                  </TableCell>
+              {notices.slice(0, 4).map((notice) => (
+                <TableRow key={notice.id}>
+                  <TableCell className="font-medium">{notice.title}</TableCell>
+                  <TableCell>{notice.date}</TableCell>
+                  <TableCell className="text-right">{notice.author}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

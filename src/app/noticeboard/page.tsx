@@ -1,0 +1,205 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button, buttonVariants } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { notices } from '@/lib/data';
+import { format } from 'date-fns';
+
+type Notice = (typeof notices)[0];
+
+export default function NoticeboardPage() {
+  const [noticesData, setNoticesData] = useState(notices);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [editingNotice, setEditingNotice] = useState<Notice | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Notice | null>(null);
+
+  const handleOpenModal = (notice: Notice | null) => {
+    setEditingNotice(notice);
+    setModalOpen(true);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+
+    if (title && content) {
+      if (editingNotice) {
+        // Edit existing notice
+        const updatedNotice = { ...editingNotice, title, content, date: format(new Date(), 'yyyy-MM-dd') };
+        setNoticesData(noticesData.map((n) => (n.id === editingNotice.id ? updatedNotice : n)));
+      } else {
+        // Add new notice
+        const newNotice: Notice = {
+          id: `N${(noticesData.length + 1).toString().padStart(2, '0')}`,
+          title,
+          content,
+          date: format(new Date(), 'yyyy-MM-dd'),
+          author: 'Admin',
+        };
+        setNoticesData([newNotice, ...noticesData]);
+      }
+      setModalOpen(false);
+      setEditingNotice(null);
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return;
+    setNoticesData(noticesData.filter((n) => n.id !== deleteTarget.id));
+    setDeleteTarget(null);
+  };
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Noticeboard</CardTitle>
+              <CardDescription>Manage and publish notices for all users.</CardDescription>
+            </div>
+            <Button size="sm" className="gap-1" onClick={() => handleOpenModal(null)}>
+              <PlusCircle className="h-4 w-4" />
+              Add Notice
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Author</TableHead>
+                <TableHead>
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {noticesData.map((notice) => (
+                <TableRow key={notice.id}>
+                  <TableCell>{notice.date}</TableCell>
+                  <TableCell className="font-medium">{notice.title}</TableCell>
+                  <TableCell>{notice.author}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Toggle menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleOpenModal(notice)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(notice)}>
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Add/Edit Notice Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>{editingNotice ? 'Edit Notice' : 'Add New Notice'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} key={editingNotice ? editingNotice.id : 'add-notice'}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="title" className="text-right">
+                  Title
+                </Label>
+                <Input id="title" name="title" className="col-span-3" required defaultValue={editingNotice?.title} />
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="content" className="text-right pt-2">
+                  Content
+                </Label>
+                <Textarea id="content" name="content" className="col-span-3" rows={5} required defaultValue={editingNotice?.content} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this notice.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className={buttonVariants({ variant: 'destructive' })}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}

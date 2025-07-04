@@ -20,6 +20,7 @@ import {
   LogOut,
   Shield,
   UserCheck,
+  Megaphone,
 } from 'lucide-react';
 
 const menuItems = [
@@ -28,6 +29,7 @@ const menuItems = [
   { href: '/teachers', label: 'Teachers', icon: BookUser },
   { href: '/schedule', label: 'Schedule', icon: CalendarDays },
   { href: '/attendance', label: 'Attendance', icon: UserCheck },
+  { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },
 ];
 
