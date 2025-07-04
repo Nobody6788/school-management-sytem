@@ -44,8 +44,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
-import { notices } from '@/lib/data';
+import { notices, academic } from '@/lib/data';
 import { format } from 'date-fns';
 
 type Notice = (typeof notices)[0];
@@ -67,11 +76,12 @@ export default function NoticeboardPage() {
     const formData = new FormData(form);
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
+    const target = formData.get('target') as string;
 
-    if (title && content) {
+    if (title && content && target) {
       if (editingNotice) {
         // Edit existing notice
-        const updatedNotice = { ...editingNotice, title, content, date: format(new Date(), 'yyyy-MM-dd') };
+        const updatedNotice = { ...editingNotice, title, content, target, date: format(new Date(), 'yyyy-MM-dd') };
         setNoticesData(noticesData.map((n) => (n.id === editingNotice.id ? updatedNotice : n)));
       } else {
         // Add new notice
@@ -79,6 +89,7 @@ export default function NoticeboardPage() {
           id: `N${(noticesData.length + 1).toString().padStart(2, '0')}`,
           title,
           content,
+          target,
           date: format(new Date(), 'yyyy-MM-dd'),
           author: 'Admin',
         };
@@ -116,6 +127,7 @@ export default function NoticeboardPage() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Title</TableHead>
+                <TableHead>Target</TableHead>
                 <TableHead>Author</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
@@ -127,6 +139,7 @@ export default function NoticeboardPage() {
                 <TableRow key={notice.id}>
                   <TableCell>{notice.date}</TableCell>
                   <TableCell className="font-medium">{notice.title}</TableCell>
+                  <TableCell>{notice.target}</TableCell>
                   <TableCell>{notice.author}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -171,6 +184,48 @@ export default function NoticeboardPage() {
                   Content
                 </Label>
                 <Textarea id="content" name="content" className="col-span-3" rows={5} required defaultValue={editingNotice?.content} />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="target" className="text-right">
+                  Target
+                </Label>
+                <Select name="target" required defaultValue={editingNotice?.target || 'All Users'}>
+                  <SelectTrigger className="col-span-3" id="target">
+                    <SelectValue placeholder="Select target audience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>General</SelectLabel>
+                      <SelectItem value="All Users">All Users</SelectItem>
+                      <SelectItem value="All Students">All Students</SelectItem>
+                      <SelectItem value="All Teachers">All Teachers</SelectItem>
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Classes</SelectLabel>
+                      {academic.classes.map((c) => (
+                        <SelectItem key={c.id} value={`Class: ${c.name}`}>
+                          {`Class: ${c.name}`}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Sections</SelectLabel>
+                      {academic.sections.map((s) => (
+                         <SelectItem key={s.id} value={`Section: ${s.name} (${s.className})`}>
+                            {`Section: ${s.name} (${s.className})`}
+                         </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Groups</SelectLabel>
+                      {academic.groups.map((g) => (
+                        <SelectItem key={g.id} value={`Group: ${g.name}`}>
+                          {`Group: ${g.name}`}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter>

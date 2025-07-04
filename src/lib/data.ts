@@ -5,10 +5,10 @@ export const stats = {
 };
 
 export const notices = [
-  { id: 'N01', title: 'Annual Sports Day Postponed', content: 'The Annual Sports Day scheduled for October 15th has been postponed due to bad weather. A new date will be announced soon.', date: '2024-10-10', author: 'Admin' },
-  { id: 'N02', title: 'Science Fair Registration Open', content: 'Registrations for the Annual Science Fair are now open. Last date to register is November 1st.', date: '2024-10-05', author: 'Admin' },
-  { id: 'N03', title: 'Parent-Teacher Conference', content: 'The quarterly Parent-Teacher Conference will be held on November 20th. Please book your slots.', date: '2024-10-01', author: 'Admin' },
-  { id: 'N04', title: 'Winter Break Schedule', content: 'Winter break will commence from December 22nd, 2024.', date: '2024-09-28', author: 'Admin' },
+  { id: 'N01', title: 'Annual Sports Day Postponed', content: 'The Annual Sports Day scheduled for October 15th has been postponed due to bad weather. A new date will be announced soon.', date: '2024-10-10', author: 'Admin', target: 'All Users' },
+  { id: 'N02', title: 'Science Fair Registration Open', content: 'Registrations for the Annual Science Fair are now open. Last date to register is November 1st.', date: '2024-10-05', author: 'Admin', target: 'Group: Science Club' },
+  { id: 'N03', title: 'Parent-Teacher Conference', content: 'The quarterly Parent-Teacher Conference for Grade 10 will be held on November 20th. Please book your slots.', date: '2024-10-01', author: 'Admin', target: 'Class: Grade 10' },
+  { id: 'N04', title: 'Winter Break Schedule', content: 'Winter break will commence from December 22nd, 2024.', date: '2024-09-28', author: 'Admin', target: 'All Users' },
 ];
 
 export const students = [
