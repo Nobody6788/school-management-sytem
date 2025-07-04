@@ -36,12 +36,21 @@ const chartConfig = {
 export default function AttendancePage() {
   return (
     <div className="grid gap-6">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="flex flex-col items-center justify-center py-6">
           <CardHeader className="items-center pb-2">
-            <CardDescription>Overall Attendance</CardDescription>
+            <CardDescription>Daily Attendance</CardDescription>
             <CardTitle className="text-5xl font-bold text-primary">
-              {attendanceData.overallPercentage}%
+              {attendanceData.dailyPercentage}%
+            </CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card className="flex flex-col items-center justify-center py-6">
+          <CardHeader className="items-center pb-2">
+            <CardDescription>Yearly Attendance</CardDescription>
+            <CardTitle className="text-5xl font-bold text-primary">
+              {attendanceData.yearlyPercentage}%
             </CardTitle>
           </CardHeader>
         </Card>

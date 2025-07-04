@@ -65,7 +65,8 @@ export const academic = {
 };
 
 export const attendanceData = {
-  overallPercentage: 92.5,
+  dailyPercentage: 92.5,
+  yearlyPercentage: 94.1,
   byGrade: [
     { grade: 'Grade 9', percentage: 95.2 },
     { grade: 'Grade 10', percentage: 91.8 },
