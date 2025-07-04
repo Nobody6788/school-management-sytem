@@ -66,10 +66,11 @@ export default function AdminPage() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     const name = formData.get('name') as string;
+    const capacity = parseInt(formData.get('capacity') as string, 10);
     if (name) {
       setClasses([
         ...classes,
-        { id: `C${(classes.length + 1).toString().padStart(2, '0')}`, name },
+        { id: `C${(classes.length + 1).toString().padStart(2, '0')}`, name, capacity },
       ]);
       form.reset();
       setClassDialogOpen(false);
@@ -82,10 +83,11 @@ export default function AdminPage() {
     const formData = new FormData(form);
     const name = formData.get('name') as string;
     const className = formData.get('className') as string;
+    const capacity = parseInt(formData.get('capacity') as string, 10);
     if (name && className) {
       setSections([
         ...sections,
-        { id: `S${(sections.length + 1).toString().padStart(2, '0')}`, name, className },
+        { id: `S${(sections.length + 1).toString().padStart(2, '0')}`, name, className, capacity },
       ]);
       form.reset();
       setSectionDialogOpen(false);
@@ -148,6 +150,12 @@ export default function AdminPage() {
                             </Label>
                             <Input id="name" name="name" className="col-span-3" required />
                           </div>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="capacity" className="text-right">
+                              Capacity
+                            </Label>
+                            <Input id="capacity" name="capacity" type="number" className="col-span-3" required />
+                          </div>
                         </div>
                         <DialogFooter>
                           <Button type="submit">Save Class</Button>
@@ -162,6 +170,7 @@ export default function AdminPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Class Name</TableHead>
+                      <TableHead>Capacity</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -169,6 +178,7 @@ export default function AdminPage() {
                     {classes.map((c) => (
                       <TableRow key={c.id}>
                         <TableCell>{c.name}</TableCell>
+                        <TableCell>{c.capacity}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -216,6 +226,12 @@ export default function AdminPage() {
                             </Label>
                             <Input id="name" name="name" className="col-span-3" required/>
                           </div>
+                           <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="capacity" className="text-right">
+                              Capacity
+                            </Label>
+                            <Input id="capacity" name="capacity" type="number" className="col-span-3" required />
+                          </div>
                           <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="className" className="text-right">
                               Class
@@ -248,6 +264,7 @@ export default function AdminPage() {
                     <TableRow>
                       <TableHead>Section Name</TableHead>
                       <TableHead>Class</TableHead>
+                      <TableHead>Capacity</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -256,6 +273,7 @@ export default function AdminPage() {
                       <TableRow key={s.id}>
                         <TableCell>{s.name}</TableCell>
                         <TableCell>{s.className}</TableCell>
+                        <TableCell>{s.capacity}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>

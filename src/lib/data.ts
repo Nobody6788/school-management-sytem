@@ -45,15 +45,15 @@ export const schedule = {
 
 export const academic = {
   classes: [
-    { id: 'C01', name: 'Grade 9' },
-    { id: 'C02', name: 'Grade 10' },
-    { id: 'C03', name: 'Grade 11' },
-    { id: 'C04', name: 'Grade 12' },
+    { id: 'C01', name: 'Grade 9', capacity: 40 },
+    { id: 'C02', name: 'Grade 10', capacity: 40 },
+    { id: 'C03', name: 'Grade 11', capacity: 35 },
+    { id: 'C04', name: 'Grade 12', capacity: 35 },
   ],
   sections: [
-    { id: 'S01', name: 'Section A', className: 'Grade 9' },
-    { id: 'S02', name: 'Section B', className: 'Grade 9' },
-    { id: 'S03', name: 'Section A', className: 'Grade 10' },
+    { id: 'S01', name: 'Section A', className: 'Grade 9', capacity: 40 },
+    { id: 'S02', name: 'Section B', className: 'Grade 9', capacity: 40 },
+    { id: 'S03', name: 'Section A', className: 'Grade 10', capacity: 40 },
   ],
   groups: [
     { id: 'G01', name: 'Science Club' },
