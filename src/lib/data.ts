@@ -89,6 +89,7 @@ export const academic = {
     { id: 'SUB04', name: 'Physics', className: 'Grade 10' },
     { id: 'SUB05', name: 'World History', className: 'Grade 10' },
     { id: 'SUB06', name: 'Calculus', className: 'Grade 11' },
+    { id: 'SUB07', name: 'Gov & Econ', className: 'Grade 12' },
   ],
   grades: [
     { id: 'GR01', gradeName: 'A+', gradePoint: '5.0', percentageFrom: 80, percentageTo: 100 },
@@ -114,7 +115,15 @@ export const academic = {
     { id: 'EA02', examId: 'EXM01', classId: 'C01', subjectId: 'SUB02', totalStudents: 40, present: 39, absent: 1 },
     { id: 'EA03', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', totalStudents: 40, present: 35, absent: 5 },
     { id: 'EA04', examId: 'EXM02', classId: 'C03', subjectId: 'SUB06', totalStudents: 35, present: 34, absent: 1 },
-  ]
+  ],
+  results: [
+    { id: 'RES01', studentId: 'S001', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', marks: 85, status: 'Pending', submittedBy: 'T02' },
+    { id: 'RES02', studentId: 'S005', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', marks: 92, status: 'Pending', submittedBy: 'T02' },
+    { id: 'RES03', studentId: 'S002', examId: 'EXM01', classId: 'C01', subjectId: 'SUB01', marks: 78, status: 'Approved', submittedBy: 'T01' },
+    { id: 'RES04', studentId: 'S003', examId: 'EXM02', classId: 'C03', subjectId: 'SUB06', marks: 88, status: 'Pending', submittedBy: 'T01' },
+    { id: 'RES05', studentId: 'S001', examId: 'EXM01', classId: 'C02', subjectId: 'SUB05', marks: 76, status: 'Approved', submittedBy: 'T04' },
+    { id: 'RES06', studentId: 'S004', examId: 'EXM02', classId: 'C04', subjectId: 'SUB07', marks: 65, status: 'Pending', submittedBy: 'T05' },
+  ],
 };
 
 export const attendanceData = {

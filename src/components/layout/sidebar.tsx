@@ -24,6 +24,7 @@ import {
   Contact,
   GraduationCap,
   ClipboardCheck,
+  BookCheck,
 } from 'lucide-react';
 
 const menuItems = [
@@ -35,6 +36,7 @@ const menuItems = [
   { href: '/attendance', label: 'Attendance', icon: UserCheck },
   { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
   { href: '/grades', label: 'Grades', icon: GraduationCap },
+  { href: '/results', label: 'Results', icon: BookCheck },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },
 ];
