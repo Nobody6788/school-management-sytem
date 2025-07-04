@@ -63,27 +63,50 @@ type Class = (typeof academic.classes)[0];
 type Section = (typeof academic.sections)[0];
 type Group = (typeof academic.groups)[0];
 type Subject = (typeof academic.subjects)[0];
+type Exam = (typeof academic.exams)[0];
+type ExamRoutine = (typeof academic.examRoutines)[0];
+
 
 export default function AdminPage() {
   const [classes, setClasses] = useState(academic.classes);
   const [sections, setSections] = useState(academic.sections);
   const [groups, setGroups] = useState(academic.groups);
   const [subjects, setSubjects] = useState(academic.subjects);
+  const [exams, setExams] = useState(academic.exams);
+  const [examRoutines, setExamRoutines] = useState(academic.examRoutines);
+
 
   // Modal states for Add/Edit
   const [isClassModalOpen, setClassModalOpen] = useState(false);
   const [isSectionModalOpen, setSectionModalOpen] = useState(false);
   const [isGroupModalOpen, setGroupModalOpen] = useState(false);
   const [isSubjectModalOpen, setSubjectModalOpen] = useState(false);
+  const [isExamModalOpen, setExamModalOpen] = useState(false);
+  const [isRoutineModalOpen, setRoutineModalOpen] = useState(false);
+
 
   // State for item being edited
   const [editingClass, setEditingClass] = useState<Class | null>(null);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
+  const [editingExam, setEditingExam] = useState<Exam | null>(null);
+  const [editingRoutine, setEditingRoutine] = useState<ExamRoutine | null>(null);
+
+  const [selectedClassForRoutine, setSelectedClassForRoutine] = useState<string | undefined>(editingRoutine?.classId);
 
   // State for delete confirmation
   const [deleteTarget, setDeleteTarget] = useState<{ type: string; id: string } | null>(null);
+
+  // --- Helper functions ---
+  const getExamName = (examId: string) => exams.find(e => e.id === examId)?.name || 'N/A';
+  const getClassName = (classId: string) => classes.find(c => c.id === classId)?.name || 'N/A';
+  const getSubjectName = (subjectId: string) => subjects.find(s => s.id === subjectId)?.name || 'N/A';
+
+  const availableSubjectsForRoutine = selectedClassForRoutine
+  ? subjects.filter(s => s.className === getClassName(selectedClassForRoutine))
+  : [];
+
 
   // --- Handlers for Class ---
   const handleOpenClassModal = (cls: Class | null) => {
@@ -188,6 +211,61 @@ export default function AdminPage() {
       }
     };
 
+    // --- Handlers for Exam ---
+    const handleOpenExamModal = (exam: Exam | null) => {
+        setEditingExam(exam);
+        setExamModalOpen(true);
+    };
+
+    const handleExamSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const name = formData.get('name') as string;
+
+        if (name) {
+            if (editingExam) {
+                setExams(exams.map((e) => (e.id === editingExam.id ? { ...e, name } : e)));
+            } else {
+                setExams([...exams, { id: `EXM${(exams.length + 1).toString().padStart(2, '0')}`, name }]);
+            }
+            setExamModalOpen(false);
+            setEditingExam(null);
+        }
+    };
+
+    // --- Handlers for Exam Routine ---
+    const handleOpenRoutineModal = (routine: ExamRoutine | null) => {
+        setEditingRoutine(routine);
+        setSelectedClassForRoutine(routine?.classId);
+        setRoutineModalOpen(true);
+    };
+
+    const handleRoutineSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const examId = formData.get('examId') as string;
+        const classId = formData.get('classId') as string;
+        const subjectId = formData.get('subjectId') as string;
+        const date = formData.get('date') as string;
+        const startTime = formData.get('startTime') as string;
+        const endTime = formData.get('endTime') as string;
+        const room = formData.get('room') as string;
+
+        if (examId && classId && subjectId && date && startTime && endTime && room) {
+            if (editingRoutine) {
+                const updatedRoutine = { ...editingRoutine, examId, classId, subjectId, date, startTime, endTime, room };
+                setExamRoutines(examRoutines.map(r => r.id === editingRoutine.id ? updatedRoutine : r));
+            } else {
+                const newRoutine = { id: `ER${(examRoutines.length + 1).toString().padStart(2, '0')}`, examId, classId, subjectId, date, startTime, endTime, room };
+                setExamRoutines([...examRoutines, newRoutine]);
+            }
+            setRoutineModalOpen(false);
+            setEditingRoutine(null);
+        }
+    };
+
   // --- Handler for Deletion ---
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return;
@@ -211,6 +289,13 @@ export default function AdminPage() {
       case 'subject':
         setSubjects(subjects.filter((s) => s.id !== deleteTarget.id));
         break;
+      case 'exam':
+        setExamRoutines(routines => routines.filter(r => r.examId !== deleteTarget.id));
+        setExams(exams.filter((e) => e.id !== deleteTarget.id));
+        break;
+      case 'examRoutine':
+        setExamRoutines(examRoutines.filter((r) => r.id !== deleteTarget.id));
+        break;
     }
     setDeleteTarget(null);
   };
@@ -226,11 +311,12 @@ export default function AdminPage() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="classes">
-            <TabsList>
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="classes">Classes</TabsTrigger>
               <TabsTrigger value="sections">Sections</TabsTrigger>
               <TabsTrigger value="groups">Groups</TabsTrigger>
               <TabsTrigger value="subjects">Subjects</TabsTrigger>
+              <TabsTrigger value="exams">Exams</TabsTrigger>
             </TabsList>
 
             {/* Classes Tab */}
@@ -424,6 +510,123 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {/* Exams Tab */}
+            <TabsContent value="exams">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Exam Management</CardTitle>
+                        <CardDescription>Manage exam types and their routines.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Tabs defaultValue="exam-list">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="exam-list">Exam List</TabsTrigger>
+                                <TabsTrigger value="exam-routine">Exam Routine</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="exam-list">
+                                <Card>
+                                    <CardHeader>
+                                        <div className="flex justify-between items-center">
+                                            <CardTitle>Exam Types</CardTitle>
+                                            <Button size="sm" onClick={() => handleOpenExamModal(null)}>
+                                                <PlusCircle className="h-4 w-4 mr-2" />
+                                                Add Exam
+                                            </Button>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Exam Name</TableHead>
+                                                    <TableHead className="text-right">Actions</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {exams.map((e) => (
+                                                    <TableRow key={e.id}>
+                                                        <TableCell>{e.name}</TableCell>
+                                                        <TableCell className="text-right">
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button size="icon" variant="ghost">
+                                                                        <MoreHorizontal className="h-4 w-4" />
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent>
+                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                    <DropdownMenuItem onClick={() => handleOpenExamModal(e)}>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'exam', id: e.id })}>Delete</DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                            <TabsContent value="exam-routine">
+                               <Card>
+                                    <CardHeader>
+                                        <div className="flex justify-between items-center">
+                                            <CardTitle>Exam Routines</CardTitle>
+                                            <Button size="sm" onClick={() => handleOpenRoutineModal(null)}>
+                                                <PlusCircle className="h-4 w-4 mr-2" />
+                                                Add Routine
+                                            </Button>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Exam</TableHead>
+                                                    <TableHead>Class</TableHead>
+                                                    <TableHead>Subject</TableHead>
+                                                    <TableHead>Date</TableHead>
+                                                    <TableHead>Time</TableHead>
+                                                    <TableHead>Room</TableHead>
+                                                    <TableHead className="text-right">Actions</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {examRoutines.map((r) => (
+                                                    <TableRow key={r.id}>
+                                                        <TableCell>{getExamName(r.examId)}</TableCell>
+                                                        <TableCell>{getClassName(r.classId)}</TableCell>
+                                                        <TableCell>{getSubjectName(r.subjectId)}</TableCell>
+                                                        <TableCell>{r.date}</TableCell>
+                                                        <TableCell>{r.startTime} - {r.endTime}</TableCell>
+                                                        <TableCell>{r.room}</TableCell>
+                                                        <TableCell className="text-right">
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button size="icon" variant="ghost">
+                                                                        <MoreHorizontal className="h-4 w-4" />
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent>
+                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                    <DropdownMenuItem onClick={() => handleOpenRoutineModal(r)}>Edit</DropdownMenuItem>
+                                                                    <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'examRoutine', id: r.id })}>Delete</DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        </Tabs>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+
           </Tabs>
         </CardContent>
       </Card>
@@ -550,13 +753,88 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Exam Modal */}
+        <Dialog open={isExamModalOpen} onOpenChange={setExamModalOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{editingExam ? 'Edit Exam' : 'Add New Exam'}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleExamSubmit} key={editingExam ? editingExam.id : 'add-exam'}>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="name" className="text-right">Name</Label>
+                            <Input id="name" name="name" className="col-span-3" required defaultValue={editingExam?.name} />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setExamModalOpen(false)}>Cancel</Button>
+                        <Button type="submit">Save Changes</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+
+      {/* Exam Routine Modal */}
+      <Dialog open={isRoutineModalOpen} onOpenChange={setRoutineModalOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>{editingRoutine ? 'Edit Routine' : 'Add New Routine'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleRoutineSubmit} key={editingRoutine ? editingRoutine.id : 'add-routine'}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="examId" className="text-right">Exam</Label>
+                <Select name="examId" required defaultValue={editingRoutine?.examId}>
+                  <SelectTrigger className="col-span-3"><SelectValue placeholder="Select an exam" /></SelectTrigger>
+                  <SelectContent>{exams.map((e) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="classId" className="text-right">Class</Label>
+                <Select name="classId" required onValueChange={setSelectedClassForRoutine} defaultValue={editingRoutine?.classId}>
+                  <SelectTrigger className="col-span-3"><SelectValue placeholder="Select a class" /></SelectTrigger>
+                  <SelectContent>{classes.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="subjectId" className="text-right">Subject</Label>
+                <Select name="subjectId" required disabled={!selectedClassForRoutine} defaultValue={editingRoutine?.subjectId}>
+                  <SelectTrigger className="col-span-3"><SelectValue placeholder="Select subject" /></SelectTrigger>
+                  <SelectContent>{availableSubjectsForRoutine.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="date" className="text-right">Date</Label>
+                <Input id="date" name="date" type="date" className="col-span-3" required defaultValue={editingRoutine?.date} />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Time</Label>
+                <div className="col-span-3 grid grid-cols-2 gap-2">
+                    <Input id="startTime" name="startTime" type="time" required defaultValue={editingRoutine?.startTime} />
+                    <Input id="endTime" name="endTime" type="time" required defaultValue={editingRoutine?.endTime} />
+                </div>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="room" className="text-right">Room No.</Label>
+                <Input id="room" name="room" className="col-span-3" required defaultValue={editingRoutine?.room} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setRoutineModalOpen(false)}>Cancel</Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the selected item and any associated sections or subjects.
+              This action cannot be undone. This will permanently delete the selected item and any associated data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

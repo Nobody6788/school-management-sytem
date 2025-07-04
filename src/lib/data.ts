@@ -99,6 +99,16 @@ export const academic = {
     { id: 'GR06', gradeName: 'D', gradePoint: '1.0', percentageFrom: 33, percentageTo: 39 },
     { id: 'GR07', gradeName: 'F', gradePoint: '0.0', percentageFrom: 0, percentageTo: 32 },
   ],
+  exams: [
+    { id: 'EXM01', name: 'Mid-Term Examination' },
+    { id: 'EXM02', name: 'Final Examination' },
+  ],
+  examRoutines: [
+    { id: 'ER01', examId: 'EXM01', classId: 'C01', subjectId: 'SUB01', date: '2024-12-01', startTime: '09:00', endTime: '12:00', room: '201' },
+    { id: 'ER02', examId: 'EXM01', classId: 'C01', subjectId: 'SUB02', date: '2024-12-02', startTime: '09:00', endTime: '12:00', room: '201' },
+    { id: 'ER03', examId: 'EXM01', classId: 'C02', subjectId: 'SUB04', date: '2024-12-01', startTime: '09:00', endTime: '12:00', room: '202' },
+    { id: 'ER04', examId: 'EXM02', classId: 'C03', subjectId: 'SUB06', date: '2025-05-20', startTime: '09:00', endTime: '12:00', room: '301' },
+  ]
 };
 
 export const attendanceData = {
