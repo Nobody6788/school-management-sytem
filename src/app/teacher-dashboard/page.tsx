@@ -205,12 +205,12 @@ export default function TeacherDashboardPage() {
                     <ul className="space-y-4">
                        {relevantNotices.slice(0, 3).map(notice => (
                            <li key={notice.id} className="p-4 rounded-md border">
-                               <div className="flex justify-between items-start">
-                                   <div>
-                                       <h4 className="font-semibold">{notice.title}</h4>
-                                       <p className="text-sm text-muted-foreground">{notice.content}</p>
+                               <div className="flex items-start justify-between gap-4">
+                                   <div className="min-w-0">
+                                       <h4 className="font-semibold truncate">{notice.title}</h4>
+                                       <p className="text-sm text-muted-foreground truncate">{notice.content}</p>
                                    </div>
-                                   <Badge variant="outline">{notice.date}</Badge>
+                                   <Badge variant="outline" className="flex-shrink-0">{notice.date}</Badge>
                                </div>
                            </li>
                        ))}
