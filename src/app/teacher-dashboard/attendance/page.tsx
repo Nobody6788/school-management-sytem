@@ -154,8 +154,8 @@ export default function TeacherAttendancePage() {
         setAttendances([...otherAttendances, ...newAttendanceRecords]);
 
         toast({
-            title: 'Attendance Saved',
-            description: `Attendance for ${selectedClass} - ${selectedSection} on ${format(selectedDate, 'PPP')} has been saved.`,
+            title: 'Attendance Updated',
+            description: `Attendance for ${selectedClass} - ${selectedSection} on ${format(selectedDate, 'PPP')} has been successfully updated.`,
         });
     };
 
@@ -165,7 +165,7 @@ export default function TeacherAttendancePage() {
         <Card>
             <CardHeader>
                 <CardTitle>Manage Attendance</CardTitle>
-                <CardDescription>Select class, section, and date to take or view student attendance.</CardDescription>
+                <CardDescription>Select a class, section, and date to take, view, or modify student attendance.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="flex flex-wrap items-end gap-4 mb-6">
@@ -268,7 +268,7 @@ export default function TeacherAttendancePage() {
                 <CardFooter>
                     <Button onClick={handleSaveAttendance}>
                         <CheckCircle className="mr-2 h-4 w-4" />
-                        Save Attendance
+                        Save Changes
                     </Button>
                 </CardFooter>
             )}
