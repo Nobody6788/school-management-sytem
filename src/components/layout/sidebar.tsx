@@ -29,10 +29,12 @@ import {
   Library,
   Bus,
   DollarSign,
+  User,
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/profile', label: 'Profile', icon: User },
   { href: '/students', label: 'Students', icon: Users },
   { href: '/teachers', label: 'Teachers', icon: BookUser },
   { href: '/parents', label: 'Parents', icon: Contact },

@@ -227,3 +227,12 @@ export const accounting = {
     },
   ]
 };
+
+export const adminProfile = {
+  id: 'ADMIN01',
+  name: 'Admin User',
+  email: 'admin@campusflow.com',
+  phone: '555-0199',
+  address: '123 Admin Way, Tech City, 10101',
+  profilePicture: 'https://placehold.co/100x100.png'
+};
