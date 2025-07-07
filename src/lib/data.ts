@@ -255,6 +255,12 @@ export const studentAttendances = [
     { id: 'ATT04', studentId: 'S001', date: '2024-10-22', status: 'Present', classId: 'C02', section: 'Section A' },
 ];
 
+export const examStudentAttendances = [
+  { id: 'ESA01', studentId: 'S001', examId: 'EXM01', subjectId: 'SUB04', status: 'Present' },
+  { id: 'ESA02', studentId: 'S005', examId: 'EXM01', subjectId: 'SUB04', status: 'Present' },
+  { id: 'ESA03', studentId: 'S001', examId: 'EXM01', subjectId: 'SUB05', status: 'Absent' },
+];
+
 export const adminProfile = {
   id: 'ADMIN01',
   name: 'Admin User',
