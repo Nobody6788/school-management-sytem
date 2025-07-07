@@ -248,6 +248,13 @@ export const accounting = {
   ]
 };
 
+export const studentAttendances = [
+    { id: 'ATT01', studentId: 'S001', date: '2024-10-21', status: 'Present', classId: 'C02', section: 'Section A' },
+    { id: 'ATT02', studentId: 'S005', date: '2024-10-21', status: 'Absent', classId: 'C02', section: 'Section B' },
+    { id: 'ATT03', studentId: 'S002', date: '2024-10-21', status: 'Late', classId: 'C01', section: 'Section B' },
+    { id: 'ATT04', studentId: 'S001', date: '2024-10-22', status: 'Present', classId: 'C02', section: 'Section A' },
+];
+
 export const adminProfile = {
   id: 'ADMIN01',
   name: 'Admin User',
