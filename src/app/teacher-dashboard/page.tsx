@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Users, CalendarCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BookOpen, Users, CalendarCheck, ArrowRight } from 'lucide-react';
 import { teachers, students, schedule, notices as allNotices } from '@/lib/data';
 
 // Assuming logged-in teacher is Ms. Ava Davis
@@ -159,12 +161,12 @@ export default function TeacherDashboardPage() {
                         )}
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle>My Students</CardTitle>
                         <CardDescription>A quick list of students in your classes.</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-grow">
                          <Table>
                             <TableHeader>
                                 <TableRow>
@@ -184,6 +186,13 @@ export default function TeacherDashboardPage() {
                             </TableBody>
                         </Table>
                     </CardContent>
+                    <CardFooter>
+                        <Button asChild variant="outline" size="sm" className="w-full">
+                            <Link href="/teacher-dashboard/students">
+                                View All Students <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </CardFooter>
                 </Card>
             </div>
             
