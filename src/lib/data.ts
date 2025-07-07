@@ -353,3 +353,8 @@ export const studentPersonalEvents = [
   { id: 'SE01', date: '2024-11-15', title: 'Science Project Deadline', description: 'Submit the final draft of the physics project.' },
   { id: 'SE02', date: '2024-11-20', title: 'Basketball Tryouts', description: 'Tryouts for the school basketball team in the gym at 4 PM.' },
 ];
+
+export const parentPersonalEvents = [
+  { id: 'PE01', date: '2024-11-20', title: 'Attend Parent-Teacher Conference', description: 'Meeting with Grade 10 teachers.' },
+  { id: 'PE02', date: '2024-12-10', title: 'Volunteer for Bake Sale', description: 'Help out at the annual school fundraiser.' },
+];
