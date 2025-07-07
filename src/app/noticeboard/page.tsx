@@ -66,6 +66,10 @@ export default function NoticeboardPage() {
   const [editingNotice, setEditingNotice] = useState<Notice | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Notice | null>(null);
 
+  // For demonstration, we'll assume the logged-in user is 'Admin'.
+  // In a real application, this would come from an authentication context.
+  const currentAdmin = 'Admin';
+
   const handleOpenModal = (notice: Notice | null) => {
     setEditingNotice(notice);
     setModalOpen(true);
@@ -92,7 +96,7 @@ export default function NoticeboardPage() {
           content,
           target,
           date: format(new Date(), 'yyyy-MM-dd'),
-          author: 'Admin',
+          author: currentAdmin, // Set the author to the current admin
         };
         setNoticesData([newNotice, ...noticesData]);
       }
@@ -153,9 +157,11 @@ export default function NoticeboardPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleOpenModal(notice)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(notice)}>
-                          Delete
-                        </DropdownMenuItem>
+                        {notice.author === currentAdmin && (
+                           <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget(notice)}>
+                            Delete
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
