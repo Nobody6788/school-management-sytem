@@ -78,6 +78,7 @@ const menuItems = [
   { href: '/parent-dashboard/grades', label: 'Grading System', icon: GraduationCap },
   { href: '/parent-dashboard/results', label: "Child's Results", icon: BookCheck },
   { href: '/parent-dashboard/teachers', label: 'Teachers', icon: BookUser },
+  { href: '/parent-dashboard/library', label: 'Library', icon: Library },
   { href: '/parent-dashboard/parents', label: 'Other Parents', icon: Contact },
   { href: '/parent-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
   { href: '/parent-dashboard/noticeboard', label: 'Noticeboard', icon: Megaphone },
