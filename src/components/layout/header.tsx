@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, HelpCircle, LogOut, User } from 'lucide-react';
+import { Bell, HelpCircle, LogOut, User, CalendarCheck, FlaskConical } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -33,8 +33,14 @@ export function AppHeader() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Notifications</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Parent-Teacher meeting scheduled.</DropdownMenuItem>
-          <DropdownMenuItem>Science fair registration is open.</DropdownMenuItem>
+          <DropdownMenuItem>
+            <CalendarCheck className="mr-2 h-4 w-4" />
+            <span>Parent-Teacher meeting scheduled.</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <FlaskConical className="mr-2 h-4 w-4" />
+            <span>Science fair registration is open.</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>
