@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -81,78 +81,40 @@ export default function TeacherAttendancePage() {
 
     const sectionsForSelectedClass = teacherClasses.find(c => c.grade === selectedClass)?.sections || [];
 
-    const loadAttendance = () => {
-        if (!selectedClass || !selectedSection || !selectedDate) {
-            setStudentAttendance([]);
-            return;
-        }
-
-        const studentsInClass = students.filter(
-            s => s.grade === selectedClass && s.section === selectedSection
-        );
-
-        const loadedAttendances = studentsInClass.map(student => {
-            const existingRecord = attendances.find(
-                att => att.studentId === student.id && isSameDay(new Date(att.date + 'T00:00:00'), selectedDate!)
+    useEffect(() => {
+        if (selectedClass && selectedSection && selectedDate) {
+            const studentsInClass = students.filter(
+                s => s.grade === selectedClass && s.section === selectedSection
             );
-            return {
-                studentId: student.id,
-                status: (existingRecord?.status as AttendanceStatus) || 'Present',
-            };
-        });
 
-        setStudentAttendance(loadedAttendances);
-    };
+            const loadedAttendances = studentsInClass.map(student => {
+                const existingRecord = attendances.find(
+                    att => att.studentId === student.id && isSameDay(new Date(att.date + 'T00:00:00'), selectedDate)
+                );
+                return {
+                    studentId: student.id,
+                    status: (existingRecord?.status as AttendanceStatus) || 'Present',
+                };
+            });
+
+            setStudentAttendance(loadedAttendances);
+        } else {
+            setStudentAttendance([]); // Clear list if filters are incomplete
+        }
+    }, [selectedClass, selectedSection, selectedDate, attendances]);
+
 
     const handleClassChange = (grade: string) => {
         setSelectedClass(grade);
         setSelectedSection(''); // Reset section when class changes
-        setStudentAttendance([]);
     };
 
     const handleSectionChange = (section: string) => {
         setSelectedSection(section);
-        // Automatically fetch students when section is selected
-        if(selectedClass && section && selectedDate) {
-            loadAttendanceOnFilterChange(selectedClass, section, selectedDate);
-        }
     };
     
     const handleDateChange = (date: Date | undefined) => {
         setSelectedDate(date);
-         if(selectedClass && selectedSection && date) {
-            loadAttendanceOnFilterChange(selectedClass, selectedSection, date);
-        }
-    };
-
-    const loadAttendanceOnFilterChange = (grade: string, section: string, date: Date) => {
-        const studentsInClass = students.filter(
-            s => s.grade === grade && s.section === section
-        );
-
-        const loadedAttendances = studentsInClass.map(student => {
-            const existingRecord = attendances.find(
-                att => att.studentId === student.id && isSameDay(new Date(att.date + 'T00:00:00'), date)
-            );
-            return {
-                studentId: student.id,
-                status: (existingRecord?.status as AttendanceStatus) || 'Present',
-            };
-        });
-
-        setStudentAttendance(loadedAttendances);
-    }
-
-    const handleFetchStudents = () => {
-        if (!selectedClass || !selectedSection || !selectedDate) {
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: 'Please select a class, section, and date.',
-            });
-            return;
-        }
-        loadAttendance();
     };
 
     const handleAttendanceChange = (studentId: string, status: AttendanceStatus) => {
@@ -176,7 +138,8 @@ export default function TeacherAttendancePage() {
         
         const otherAttendances = attendances.filter(att => {
           const attDate = new Date(att.date + 'T00:00:00');
-          return !(att.classId === classId && att.section === selectedSection && isSameDay(attDate, selectedDate));
+          const isSameDayAndClass = att.classId === classId && att.section === selectedSection && isSameDay(attDate, selectedDate);
+          return !isSameDayAndClass;
         });
 
         const newAttendanceRecords = studentAttendance.map(att => ({
@@ -201,8 +164,8 @@ export default function TeacherAttendancePage() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Take Attendance</CardTitle>
-                <CardDescription>Select class, section, and date to take or update student attendance.</CardDescription>
+                <CardTitle>Manage Attendance</CardTitle>
+                <CardDescription>Select class, section, and date to take or view student attendance.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="flex flex-wrap items-end gap-4 mb-6">
@@ -255,7 +218,6 @@ export default function TeacherAttendancePage() {
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <Button onClick={handleFetchStudents} disabled={!selectedClass || !selectedSection || !selectedDate}>Fetch Students</Button>
                 </div>
                 
                 {studentAttendance.length > 0 ? (
@@ -298,7 +260,7 @@ export default function TeacherAttendancePage() {
                     </Table>
                 ) : (
                     <div className="text-center text-muted-foreground py-8 border rounded-md">
-                        <p>Please select a class, section, and date to fetch the student list.</p>
+                        <p>Please select a class, section, and date to show the student list.</p>
                     </div>
                 )}
             </CardContent>
