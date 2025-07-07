@@ -30,11 +30,11 @@ export const teachers = [
 ];
 
 export const parents = [
-    { id: 'P01', name: 'David Martin', email: 'david.martin@example.com', phone: '555-0101', studentId: 'S001' },
-    { id: 'P02', name: 'Robert Lee', email: 'robert.lee@example.com', phone: '555-0102', studentId: 'S002' },
-    { id: 'P03', name: 'Maria Nguyen', email: 'maria.nguyen@example.com', phone: '555-0103', studentId: 'S003' },
-    { id: 'P04', name: 'James Kim', email: 'james.kim@example.com', phone: '555-0104', studentId: 'S004' },
-    { id: 'P05', name: 'Linda Rodriguez', email: 'linda.rodriguez@example.com', phone: '555-0105', studentId: 'S005' },
+    { id: 'P01', name: 'David Martin', email: 'david.martin@example.com', phone: '555-0101', studentId: 'S001', address: '123 Parent Ave', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'P02', name: 'Robert Lee', email: 'robert.lee@example.com', phone: '555-0102', studentId: 'S002', address: '456 Parent Blvd', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'P03', name: 'Maria Nguyen', email: 'maria.nguyen@example.com', phone: '555-0103', studentId: 'S003', address: '789 Parent Ct', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'P04', name: 'James Kim', email: 'james.kim@example.com', phone: '555-0104', studentId: 'S004', address: '101 Parent Way', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'P05', name: 'Linda Rodriguez', email: 'linda.rodriguez@example.com', phone: '555-0105', studentId: 'S005', address: '212 Parent Rd', profilePicture: 'https://placehold.co/100x100.png' },
 ];
 
 export const schedule = {
