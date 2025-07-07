@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -25,7 +26,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { teachers, students, schedule } from '@/lib/data';
+import { teachers, students, schedule, parents } from '@/lib/data';
 
 // Assuming logged-in teacher is Ms. Ava Davis
 const teacher = teachers.find(t => t.id === 'T02');
@@ -48,14 +49,18 @@ const getTeacherStudents = () => {
 };
 
 type Student = (typeof students)[0];
+type Parent = (typeof parents)[0];
 
 export default function TeacherStudentsPage() {
   const [teacherStudents] = useState(getTeacherStudents());
   const [isViewModalOpen, setViewModalOpen] = useState(false);
   const [viewingStudent, setViewingStudent] = useState<Student | null>(null);
+  const [viewingParent, setViewingParent] = useState<Parent | null>(null);
 
   const handleOpenViewModal = (student: Student) => {
+    const parentInfo = parents.find(p => p.studentId === student.id) || null;
     setViewingStudent(student);
+    setViewingParent(parentInfo);
     setViewModalOpen(true);
   };
   
@@ -148,14 +153,34 @@ export default function TeacherStudentsPage() {
               </div>
 
               <h3 className="font-semibold text-base mt-4 border-t pt-4">Parent Information</h3>
-               <div className="grid grid-cols-3 gap-2">
-                <div className="font-semibold text-muted-foreground">Parent's Name</div>
-                <div className="col-span-2">{viewingStudent.parentName}</div>
-              </div>
-               <div className="grid grid-cols-3 gap-2">
-                <div className="font-semibold text-muted-foreground">Contact Email</div>
-                <div className="col-span-2">{viewingStudent.email}</div>
-              </div>
+              {viewingParent ? (
+                <>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="font-semibold text-muted-foreground">Parent's Name</div>
+                    <div className="col-span-2">{viewingParent.name}</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="font-semibold text-muted-foreground">Contact Email</div>
+                    <div className="col-span-2">{viewingParent.email}</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="font-semibold text-muted-foreground">Contact Phone</div>
+                    <div className="col-span-2">{viewingParent.phone}</div>
+                  </div>
+                </>
+              ) : (
+                 <>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="font-semibold text-muted-foreground">Parent's Name</div>
+                    <div className="col-span-2">{viewingStudent.parentName}</div>
+                  </div>
+                   <div className="grid grid-cols-3 gap-2">
+                      <div className="col-span-3 text-muted-foreground text-xs italic">
+                        No detailed contact information available for the parent.
+                      </div>
+                    </div>
+                </>
+              )}
             </div>
           )}
           <DialogFooter>
