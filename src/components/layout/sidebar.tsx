@@ -33,10 +33,12 @@ import {
   Settings,
   BedDouble,
   CalendarPlus,
+  ClipboardList,
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/teacher-dashboard', label: 'Teacher Dashboard', icon: ClipboardList },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/calendar', label: 'My Calendar', icon: CalendarPlus },
   { href: '/students', label: 'Students', icon: Users },
