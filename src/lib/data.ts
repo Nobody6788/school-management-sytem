@@ -1,4 +1,5 @@
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -335,4 +336,9 @@ export const messages = [
 export const teacherPersonalEvents = [
   { id: 'TE01', date: '2024-10-28', title: 'Submit Physics Mid-Term Grades', description: 'Final deadline for submitting grades for the mid-term exams.' },
   { id: 'TE02', date: '2024-11-10', title: 'Prepare Lab for Chemistry Practical', description: 'Restock chemicals and prepare equipment for Grade 10 practicals.' },
+];
+
+export const studentPersonalEvents = [
+  { id: 'SE01', date: '2024-11-15', title: 'Science Project Deadline', description: 'Submit the final draft of the physics project.' },
+  { id: 'SE02', date: '2024-11-20', title: 'Basketball Tryouts', description: 'Tryouts for the school basketball team in the gym at 4 PM.' },
 ];
