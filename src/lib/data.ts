@@ -265,3 +265,9 @@ export const settings = {
   logo: 'https://placehold.co/100x100.png',
   timezone: 'America/New_York',
 };
+
+export const personalEvents = [
+  { id: 'E01', date: '2024-10-25', title: 'Review Q3 Budget', description: 'Finalize the budget report for the third quarter.' },
+  { id: 'E02', date: '2024-11-05', title: 'Meeting with School Board', description: 'Discuss the new curriculum proposal.' },
+  { id: 'E03', date: '2024-11-05', title: 'Prepare for Science Fair', description: 'Coordinate with science teachers for the upcoming fair.' },
+];

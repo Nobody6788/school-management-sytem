@@ -32,11 +32,13 @@ import {
   User,
   Settings,
   BedDouble,
+  CalendarPlus,
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/profile', label: 'Profile', icon: User },
+  { href: '/calendar', label: 'My Calendar', icon: CalendarPlus },
   { href: '/students', label: 'Students', icon: Users },
   { href: '/teachers', label: 'Teachers', icon: BookUser },
   { href: '/parents', label: 'Parents', icon: Contact },
