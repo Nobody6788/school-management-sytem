@@ -331,3 +331,8 @@ export const messages = [
     read: true,
   },
 ];
+
+export const teacherPersonalEvents = [
+  { id: 'TE01', date: '2024-10-28', title: 'Submit Physics Mid-Term Grades', description: 'Final deadline for submitting grades for the mid-term exams.' },
+  { id: 'TE02', date: '2024-11-10', title: 'Prepare Lab for Chemistry Practical', description: 'Restock chemicals and prepare equipment for Grade 10 practicals.' },
+];
