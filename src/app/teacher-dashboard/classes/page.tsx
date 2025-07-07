@@ -18,6 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { teachers, students, schedule } from '@/lib/data';
 
 // Assuming logged-in teacher is Ms. Ava Davis
@@ -84,52 +85,69 @@ export default function TeacherClassesPage() {
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
     return (
-        <div className="flex flex-col gap-6">
-             <Card>
-                <CardHeader>
-                    <CardTitle>My Classes</CardTitle>
-                    <CardDescription>Detailed information about the classes you teach.</CardDescription>
-                </CardHeader>
-            </Card>
-            {teacherClasses.map(classInfo => (
-                <Card key={classInfo.grade}>
-                    <CardHeader>
-                        <CardTitle>{classInfo.grade}</CardTitle>
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground pt-2">
-                           <span>Total Students: <strong className="text-foreground">{classInfo.totalStudents}</strong></span>
-                           <div className="flex items-center gap-2">
-                            <span>Sections:</span>
-                            <div className="flex flex-wrap gap-1">
-                                {classInfo.sections.map(s => <Badge key={s} variant="secondary">{s}</Badge>)}
-                            </div>
-                           </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <CardTitle className="text-lg mb-4">Class Routine</CardTitle>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[120px]">Time</TableHead>
-                                    {days.map(day => <TableHead key={day}>{day}</TableHead>)}
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {classInfo.schedule.map((slot, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell className="font-medium">{slot.time}</TableCell>
-                                        <TableCell>{slot.monday}</TableCell>
-                                        <TableCell>{slot.tuesday}</TableCell>
-                                        <TableCell>{slot.wednesday}</TableCell>
-                                        <TableCell>{slot.thursday}</TableCell>
-                                        <TableCell>{slot.friday}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
+        <Card>
+            <CardHeader>
+                <CardTitle>My Classes</CardTitle>
+                <CardDescription>View detailed information and weekly routines for each of your classes.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {teacherClasses.length > 0 ? (
+                    <Tabs defaultValue={teacherClasses[0].grade} className="w-full">
+                        <TabsList>
+                            {teacherClasses.map(classInfo => (
+                                <TabsTrigger key={classInfo.grade} value={classInfo.grade}>
+                                    {classInfo.grade}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                        {teacherClasses.map(classInfo => (
+                            <TabsContent key={classInfo.grade} value={classInfo.grade}>
+                                <Card className="mt-4">
+                                    <CardHeader>
+                                        <CardTitle>{classInfo.grade}</CardTitle>
+                                        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground pt-2">
+                                        <span>Total Students: <strong className="text-foreground">{classInfo.totalStudents}</strong></span>
+                                        <div className="flex items-center gap-2">
+                                            <span>Sections:</span>
+                                            <div className="flex flex-wrap gap-1">
+                                                {classInfo.sections.map(s => <Badge key={s} variant="secondary">{s}</Badge>)}
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <h3 className="text-lg font-semibold mb-4">Class Routine</h3>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[120px]">Time</TableHead>
+                                                    {days.map(day => <TableHead key={day}>{day}</TableHead>)}
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {classInfo.schedule.map((slot, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell className="font-medium">{slot.time}</TableCell>
+                                                        <TableCell>{slot.monday}</TableCell>
+                                                        <TableCell>{slot.tuesday}</TableCell>
+                                                        <TableCell>{slot.wednesday}</TableCell>
+                                                        <TableCell>{slot.thursday}</TableCell>
+                                                        <TableCell>{slot.friday}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        ))}
+                    </Tabs>
+                ) : (
+                    <div className="text-center text-muted-foreground py-8">
+                        You are not assigned to any classes with a schedule.
+                    </div>
+                )}
+            </CardContent>
+        </Card>
     );
 }
