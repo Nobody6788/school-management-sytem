@@ -74,6 +74,7 @@ const menuItems = [
   { href: '/student-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
   { href: '/parent-dashboard', label: 'Parent Dashboard', icon: Contact },
   { href: '/parent-dashboard/schedule', label: "Child's Schedule", icon: CalendarDays },
+  { href: '/parent-dashboard/grades', label: 'Grading System', icon: GraduationCap },
   { href: '/parent-dashboard/teachers', label: 'Teachers', icon: BookUser },
   { href: '/parent-dashboard/parents', label: 'Other Parents', icon: Contact },
   { href: '/parent-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
