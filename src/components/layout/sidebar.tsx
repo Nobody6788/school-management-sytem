@@ -61,6 +61,7 @@ const menuItems = [
   { href: '/student-dashboard', label: 'Student Dashboard', icon: GraduationCap },
   { href: '/student-dashboard/schedule', label: 'My Schedule', icon: CalendarDays },
   { href: '/student-dashboard/my-class', label: 'My Class', icon: BookCopy },
+  { href: '/student-dashboard/subjects', label: 'Subjects', icon: Library },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/calendar', label: 'My Calendar', icon: CalendarPlus },
   { href: '/students', label: 'Students', icon: Users },
