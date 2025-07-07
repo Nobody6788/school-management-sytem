@@ -52,6 +52,7 @@ const menuItems = [
   { href: '/teacher-dashboard/results', label: 'Submit Results', icon: BookUp },
   { href: '/teacher-dashboard/view-results', label: 'View Results', icon: BookCheck },
   { href: '/teacher-dashboard/noticeboard', label: 'Noticeboard', icon: Megaphone },
+  { href: '/teacher-dashboard/library', label: 'Library', icon: Library },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/calendar', label: 'My Calendar', icon: CalendarPlus },
   { href: '/students', label: 'Students', icon: Users },
