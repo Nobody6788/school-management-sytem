@@ -31,6 +31,7 @@ import {
   DollarSign,
   User,
   Settings,
+  BedDouble,
 } from 'lucide-react';
 
 const menuItems = [
@@ -46,6 +47,7 @@ const menuItems = [
   { href: '/results', label: 'Results', icon: BookCheck },
   { href: '/library', label: 'Library', icon: Library },
   { href: '/transport', label: 'Transport', icon: Bus },
+  { href: '/dormitories', label: 'Dormitories', icon: BedDouble },
   { href: '/accounting', label: 'Accounting', icon: DollarSign },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },

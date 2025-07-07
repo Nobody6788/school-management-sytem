@@ -179,6 +179,26 @@ export const transport = {
   ]
 };
 
+export const dormitories = {
+  list: [
+    { id: 'D01', name: 'Starlight Hall', type: 'Girls', description: 'A modern dormitory with great views.' },
+    { id: 'D02', name: 'Phoenix House', type: 'Boys', description: 'A classic dormitory with a rich history.' },
+  ],
+  rooms: [
+    { id: 'ROOM01', dormitoryId: 'D01', roomNumber: '101', costPerBed: 200 },
+    { id: 'ROOM02', dormitoryId: 'D01', roomNumber: '102', costPerBed: 200 },
+    { id: 'ROOM03', dormitoryId: 'D02', roomNumber: 'A1', costPerBed: 250 },
+  ],
+  beds: [
+    { id: 'BED01', roomId: 'ROOM01', bedNumber: 'A', studentId: 'S001' },
+    { id: 'BED02', roomId: 'ROOM01', bedNumber: 'B', studentId: 'S003' },
+    { id: 'BED03', roomId: 'ROOM01', bedNumber: 'C', studentId: null },
+    { id: 'BED04', roomId: 'ROOM02', bedNumber: 'A', studentId: null },
+    { id: 'BED05', roomId: 'ROOM03', bedNumber: 'A', studentId: 'S002' },
+    { id: 'BED06', roomId: 'ROOM03', bedNumber: 'B', studentId: null },
+  ]
+};
+
 export const accounting = {
   accountTypes: [
     { id: 'AT01', name: 'Income' },
