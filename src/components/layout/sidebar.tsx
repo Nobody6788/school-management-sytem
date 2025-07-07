@@ -74,6 +74,7 @@ const menuItems = [
   { href: '/student-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
   { href: '/parent-dashboard', label: 'Parent Dashboard', icon: Contact },
   { href: '/parent-dashboard/schedule', label: "Child's Schedule", icon: CalendarDays },
+  { href: '/parent-dashboard/exam-routine', label: "Exam Routine", icon: ClipboardList },
   { href: '/parent-dashboard/grades', label: 'Grading System', icon: GraduationCap },
   { href: '/parent-dashboard/teachers', label: 'Teachers', icon: BookUser },
   { href: '/parent-dashboard/parents', label: 'Other Parents', icon: Contact },
@@ -93,7 +94,6 @@ const menuItems = [
   { href: '/transport', label: 'Transport', icon: Bus },
   { href: '/dormitories', label: 'Dormitories', icon: BedDouble },
   { href: '/accounting', label: 'Accounting', icon: DollarSign },
-  { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];

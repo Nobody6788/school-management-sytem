@@ -1,0 +1,153 @@
+
+'use client';
+
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { academic, students, parents } from '@/lib/data';
+import { ClipboardList } from 'lucide-react';
+
+// Mocking the logged-in parent
+const loggedInParent = parents.find(p => p.id === 'P01');
+const child = loggedInParent ? students.find(s => s.id === loggedInParent.studentId) : null;
+
+export default function ParentExamRoutinePage() {
+  const { classes, exams, subjects, examRoutines } = academic;
+
+  // State for filters
+  const [selectedClassFilter, setSelectedClassFilter] = useState<string>('all');
+  const [selectedExamFilter, setSelectedExamFilter] = useState<string>('all');
+
+  // --- Helper functions ---
+  const getExamName = (examId: string) => exams.find(e => e.id === examId)?.name || 'N/A';
+  const getClassName = (classId: string) => classes.find(c => c.id === classId)?.name || 'N/A';
+  const getSubjectName = (subjectId: string) => subjects.find(s => s.id === subjectId)?.name || 'N/A';
+  const getChildClassId = () => {
+      if (!child) return null;
+      return classes.find(c => c.name === child.grade)?.id || null;
+  }
+
+  const childClassId = getChildClassId();
+
+  const filteredExamRoutines = examRoutines.filter(routine => {
+    const classMatch = selectedClassFilter === 'all' || routine.classId === selectedClassFilter;
+    const examMatch = selectedExamFilter === 'all' || routine.examId === selectedExamFilter;
+    return classMatch && examMatch;
+  });
+
+  if (!loggedInParent || !child) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Error</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p>Parent or child profile not found. This is a demo page for a sample parent.</p>
+            </CardContent>
+        </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-4">
+            <ClipboardList className="h-8 w-8 text-primary" />
+            <div>
+                <CardTitle>Examination Routine</CardTitle>
+                <CardDescription>
+                    View schedules for all upcoming examinations. Your child's class routines are highlighted.
+                </CardDescription>
+            </div>
+        </div>
+        <div className="flex items-center gap-2 pt-4">
+          <Select value={selectedExamFilter} onValueChange={setSelectedExamFilter}>
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="Filter by exam" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Exams</SelectItem>
+              {exams.map((e) => (
+                <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={selectedClassFilter} onValueChange={setSelectedClassFilter}>
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="Filter by class" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Classes</SelectItem>
+              {classes.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Exam</TableHead>
+              <TableHead>Class</TableHead>
+              <TableHead>Subject</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead>Room</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredExamRoutines.length > 0 ? (
+              filteredExamRoutines.map((r) => {
+                const isMyChildsRoutine = r.classId === childClassId;
+                return (
+                  <TableRow key={r.id} className={isMyChildsRoutine ? 'bg-primary/10' : ''}>
+                    <TableCell className="font-medium">{getExamName(r.examId)}</TableCell>
+                    <TableCell>
+                        <div className="flex items-center gap-2">
+                           <span>{getClassName(r.classId)}</span>
+                           {isMyChildsRoutine && <Badge variant="default">Child's Class</Badge>}
+                        </div>
+                    </TableCell>
+                    <TableCell>{getSubjectName(r.subjectId)}</TableCell>
+                    <TableCell>{r.date}</TableCell>
+                    <TableCell>{r.startTime} - {r.endTime}</TableCell>
+                    <TableCell>{r.room}</TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  No exam routines found for the selected filters.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
