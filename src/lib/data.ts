@@ -331,6 +331,17 @@ export const messages = [
     date: '2024-10-16T09:00:00Z',
     read: true,
   },
+  {
+    id: 'MSG05',
+    senderId: 'P01',
+    senderType: 'Parent',
+    recipientId: 'T01',
+    recipientType: 'Teacher',
+    subject: 'Question about upcoming test',
+    body: 'Hello Mr. Carter, I had a question about the format of the upcoming math test. Could you provide some details? Thank you, David Martin.',
+    date: '2024-10-22T09:00:00Z',
+    read: false,
+  },
 ];
 
 export const teacherPersonalEvents = [
