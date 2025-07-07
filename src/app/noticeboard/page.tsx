@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -54,7 +55,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
-import { notices, academic } from '@/lib/data';
+import { notices, academic, students, teachers } from '@/lib/data';
 import { format } from 'date-fns';
 
 type Notice = (typeof notices)[0];
@@ -221,6 +222,22 @@ export default function NoticeboardPage() {
                       {academic.groups.map((g) => (
                         <SelectItem key={g.id} value={`Group: ${g.name}`}>
                           {`Group: ${g.name}`}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Students</SelectLabel>
+                      {students.map((s) => (
+                        <SelectItem key={s.id} value={`Student: ${s.name}`}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Teachers</SelectLabel>
+                      {teachers.map((t) => (
+                        <SelectItem key={t.id} value={`Teacher: ${t.name}`}>
+                          {t.name}
                         </SelectItem>
                       ))}
                     </SelectGroup>
