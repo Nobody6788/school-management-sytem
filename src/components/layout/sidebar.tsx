@@ -69,6 +69,7 @@ const menuItems = [
   { href: '/student-dashboard/library', label: 'Library', icon: Library },
   { href: '/student-dashboard/teachers', label: 'Teachers', icon: Contact },
   { href: '/student-dashboard/noticeboard', label: 'Noticeboard', icon: Megaphone },
+  { href: '/student-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/calendar', label: 'My Calendar', icon: CalendarPlus },
   { href: '/students', label: 'Students', icon: Users },
