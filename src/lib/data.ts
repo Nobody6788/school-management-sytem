@@ -21,11 +21,11 @@ export const students = [
 ];
 
 export const teachers = [
-    { id: 'T01', name: 'Mr. Benjamin Carter', specialization: 'Mathematics', email: 'ben.carter@example.com' },
-    { id: 'T02', name: 'Ms. Ava Davis', specialization: 'Physics', email: 'ava.davis@example.com' },
-    { id: 'T03', name: 'Dr. Emily White', specialization: 'Chemistry', email: 'emily.white@example.com' },
-    { id: 'T04', name: 'Mr. Lucas Brown', specialization: 'History', email: 'lucas.brown@example.com' },
-    { id: 'T05', name: 'Ms. Chloe Garcia', specialization: 'English Literature', email: 'chloe.garcia@example.com' },
+    { id: 'T01', name: 'Mr. Benjamin Carter', specialization: 'Mathematics', email: 'ben.carter@example.com', phone: '555-1111', address: '123 Math Lane', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'T02', name: 'Ms. Ava Davis', specialization: 'Physics', email: 'ava.davis@example.com', phone: '555-2222', address: '456 Physics Ave', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'T03', name: 'Dr. Emily White', specialization: 'Chemistry', email: 'emily.white@example.com', phone: '555-3333', address: '789 Chemistry Blvd', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'T04', name: 'Mr. Lucas Brown', specialization: 'History', email: 'lucas.brown@example.com', phone: '555-4444', address: '101 History Ct', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'T05', name: 'Ms. Chloe Garcia', specialization: 'English Literature', email: 'chloe.garcia@example.com', phone: '555-5555', address: '212 Literature Rd', profilePicture: 'https://placehold.co/100x100.png' },
 ];
 
 export const parents = [
