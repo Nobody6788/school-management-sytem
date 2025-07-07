@@ -196,9 +196,34 @@ export const accounting = {
     { id: 'ATL07', name: 'Library Fines', typeId: 'AT01' },
     { id: 'ATL08', name: 'Transport Fees', typeId: 'AT01' },
   ],
-  transactions: [
-    { id: 'TRN001', studentId: 'S001', accountTitleId: 'ATL02', date: '2024-10-05', amount: 500, description: 'Tuition Fee for October', status: 'Paid' },
-    { id: 'TRN002', studentId: 'S002', accountTitleId: 'ATL02', date: '2024-10-05', amount: 500, description: 'Tuition Fee for October', status: 'Paid' },
-    { id: 'TRN003', studentId: 'S003', accountTitleId: 'ATL01', date: '2024-09-01', amount: 1000, description: 'Admission Fee', status: 'Paid' },
+  invoices: [
+    { 
+      id: 'INV001', 
+      studentId: 'S001', 
+      date: '2024-10-05', 
+      status: 'Paid',
+      items: [
+        { id: 'ITEM001', accountTitleId: 'ATL02', amount: 500, description: 'Tuition Fee for October' },
+        { id: 'ITEM002', accountTitleId: 'ATL08', amount: 50, description: 'Transport Fee for October' }
+      ]
+    },
+    { 
+      id: 'INV002', 
+      studentId: 'S002', 
+      date: '2024-10-05', 
+      status: 'Paid',
+      items: [
+        { id: 'ITEM003', accountTitleId: 'ATL02', amount: 500, description: 'Tuition Fee for October' }
+      ]
+    },
+    { 
+      id: 'INV003', 
+      studentId: 'S003', 
+      date: '2024-09-01', 
+      status: 'Paid',
+      items: [
+        { id: 'ITEM004', accountTitleId: 'ATL01', amount: 1000, description: 'Admission Fee' }
+      ]
+    },
   ]
 };

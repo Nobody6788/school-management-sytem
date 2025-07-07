@@ -56,36 +56,53 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MoreHorizontal, PlusCircle, Printer, FileText } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Printer, FileText, Trash2 } from 'lucide-react';
 import { accounting, students } from '@/lib/data';
 import { format } from 'date-fns';
 
 type AccountType = (typeof accounting.accountTypes)[0];
 type AccountTitle = (typeof accounting.accountTitles)[0];
-type Transaction = (typeof accounting.transactions)[0];
+type InvoiceItem = {
+  id: string;
+  accountTitleId: string;
+  amount: number;
+  description: string;
+};
+type Invoice = {
+  id: string;
+  studentId: string;
+  date: string;
+  status: string;
+  items: InvoiceItem[];
+};
+
 
 export default function AccountingPage() {
   const [accountTypes, setAccountTypes] = useState(accounting.accountTypes);
   const [accountTitles, setAccountTitles] = useState(accounting.accountTitles);
-  const [transactions, setTransactions] = useState(accounting.transactions);
+  const [invoices, setInvoices] = useState(accounting.invoices);
 
   const [isTypeModalOpen, setTypeModalOpen] = useState(false);
   const [isTitleModalOpen, setTitleModalOpen] = useState(false);
-  const [isTransactionModalOpen, setTransactionModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [isSlipModalOpen, setSlipModalOpen] = useState(false);
 
   const [editingType, setEditingType] = useState<AccountType | null>(null);
   const [editingTitle, setEditingTitle] = useState<AccountTitle | null>(null);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  
+  const [invoiceStudentId, setInvoiceStudentId] = useState('');
+  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
 
-  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
+  const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null);
 
-  const [deleteTarget, setDeleteTarget] = useState<{ type: 'type' | 'title' | 'transaction'; id: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'type' | 'title' | 'invoice'; id: string } | null>(null);
 
   const getTypeName = (typeId: string) => accountTypes.find(t => t.id === typeId)?.name || 'N/A';
   const getStudentName = (studentId: string) => students.find(s => s.id === studentId)?.name || 'N/A';
   const getStudentDetails = (studentId: string) => students.find(s => s.id === studentId);
   const getAccountTitleName = (titleId: string) => accountTitles.find(t => t.id === titleId)?.name || 'N/A';
+  const getInvoiceTotal = (items: InvoiceItem[]) => items.reduce((total, item) => total + (item.amount || 0), 0);
 
   const incomeAccountTitles = accountTitles.filter(t => t.typeId === 'AT01');
 
@@ -129,42 +146,69 @@ export default function AccountingPage() {
     }
   };
   
-  const handleOpenTransactionModal = (transaction: Transaction | null) => {
-    setEditingTransaction(transaction);
-    setTransactionModalOpen(true);
-  };
-
-  const handleTransactionSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const studentId = formData.get('studentId') as string;
-    const accountTitleId = formData.get('accountTitleId') as string;
-    const amount = parseFloat(formData.get('amount') as string);
-    const description = formData.get('description') as string;
-    
-    if (studentId && accountTitleId && !isNaN(amount)) {
-        if (editingTransaction) {
-            const updatedTransaction = { ...editingTransaction, studentId, accountTitleId, amount, description };
-            setTransactions(transactions.map(t => t.id === editingTransaction.id ? updatedTransaction : t));
-        } else {
-            const newTransaction: Transaction = {
-                id: `TRN${(transactions.length + 1).toString().padStart(3, '0')}`,
-                studentId,
-                accountTitleId,
-                amount,
-                description,
-                date: format(new Date(), 'yyyy-MM-dd'),
-                status: 'Paid',
-            };
-            setTransactions([newTransaction, ...transactions]);
-        }
-        setTransactionModalOpen(false);
-        setEditingTransaction(null);
+  const handleOpenInvoiceModal = (invoice: Invoice | null) => {
+    setEditingInvoice(invoice);
+    if (invoice) {
+        setInvoiceStudentId(invoice.studentId);
+        setInvoiceItems(JSON.parse(JSON.stringify(invoice.items))); // Deep copy
+    } else {
+        setInvoiceStudentId('');
+        setInvoiceItems([{ id: `new_${Date.now()}`, accountTitleId: '', amount: 0, description: '' }]);
     }
+    setInvoiceModalOpen(true);
   };
   
-  const handleOpenSlipModal = (transaction: Transaction) => {
-    setViewingTransaction(transaction);
+  const handleItemChange = (index: number, field: keyof Omit<InvoiceItem, 'id'>, value: string | number) => {
+    const newItems = [...invoiceItems];
+    const item = newItems[index];
+    if (field === 'amount') {
+        item.amount = parseFloat(value as string) || 0;
+    } else {
+        // @ts-ignore
+        item[field] = value;
+    }
+    setInvoiceItems(newItems);
+  };
+
+  const handleAddItem = () => {
+    setInvoiceItems([...invoiceItems, { id: `new_${Date.now()}`, accountTitleId: '', amount: 0, description: '' }]);
+  };
+
+  const handleRemoveItem = (index: number) => {
+    const newItems = invoiceItems.filter((_, i) => i !== index);
+    setInvoiceItems(newItems);
+  };
+
+  const handleInvoiceSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!invoiceStudentId || invoiceItems.some(item => !item.accountTitleId || item.amount <= 0)) {
+        alert('Please fill out all required fields for the invoice.');
+        return;
+    }
+
+    if (editingInvoice) {
+        const updatedInvoice: Invoice = {
+            ...editingInvoice,
+            studentId: invoiceStudentId,
+            items: invoiceItems.map((item, index) => ({ ...item, id: item.id.startsWith('new_') ? `ITEM${Date.now()}${index}` : item.id })),
+        };
+        setInvoices(invoices.map(i => i.id === editingInvoice.id ? updatedInvoice : i));
+    } else {
+        const newInvoice: Invoice = {
+            id: `INV${(invoices.length + 1).toString().padStart(3, '0')}`,
+            studentId: invoiceStudentId,
+            items: invoiceItems.map((item, index) => ({ ...item, id: `ITEM${Date.now()}${index}` })),
+            date: format(new Date(), 'yyyy-MM-dd'),
+            status: 'Paid',
+        };
+        setInvoices([newInvoice, ...invoices]);
+    }
+    setInvoiceModalOpen(false);
+    setEditingInvoice(null);
+  };
+
+  const handleOpenSlipModal = (invoice: Invoice) => {
+    setViewingInvoice(invoice);
     setSlipModalOpen(true);
   };
 
@@ -176,8 +220,8 @@ export default function AccountingPage() {
       setAccountTypes(accountTypes.filter(t => t.id !== deleteTarget.id));
     } else if (deleteTarget.type === 'title') {
       setAccountTitles(accountTitles.filter(t => t.id !== deleteTarget.id));
-    } else if (deleteTarget.type === 'transaction') {
-        setTransactions(transactions.filter(t => t.id !== deleteTarget.id));
+    } else if (deleteTarget.type === 'invoice') {
+        setInvoices(invoices.filter(t => t.id !== deleteTarget.id));
     }
 
     setDeleteTarget(null);
@@ -188,7 +232,7 @@ export default function AccountingPage() {
     switch (deleteTarget.type) {
         case 'type': return 'This will permanently delete the account type and all associated account titles.';
         case 'title': return 'This action cannot be undone and will permanently delete this account title.';
-        case 'transaction': return 'This action cannot be undone and will permanently delete this transaction record.';
+        case 'invoice': return 'This action cannot be undone and will permanently delete this invoice record.';
         default: return 'This action is permanent.';
     }
   }
@@ -207,7 +251,7 @@ export default function AccountingPage() {
         <CardContent>
           <Tabs defaultValue="transactions">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
+              <TabsTrigger value="transactions">Invoices</TabsTrigger>
               <TabsTrigger value="titles">Account Titles</TabsTrigger>
               <TabsTrigger value="types">Account Types</TabsTrigger>
             </TabsList>
@@ -216,9 +260,9 @@ export default function AccountingPage() {
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle>Student Payments</CardTitle>
-                    <Button size="sm" onClick={() => handleOpenTransactionModal(null)}>
-                      <PlusCircle className="mr-2 h-4 w-4" /> Add Transaction
+                    <CardTitle>Student Invoices</CardTitle>
+                    <Button size="sm" onClick={() => handleOpenInvoiceModal(null)}>
+                      <PlusCircle className="mr-2 h-4 w-4" /> Add Invoice
                     </Button>
                   </div>
                 </CardHeader>
@@ -234,20 +278,20 @@ export default function AccountingPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {transactions.map(transaction => (
-                        <TableRow key={transaction.id}>
-                          <TableCell className="font-medium">{getStudentName(transaction.studentId)}</TableCell>
-                          <TableCell>{getAccountTitleName(transaction.accountTitleId)}</TableCell>
-                          <TableCell>{transaction.date}</TableCell>
-                          <TableCell className="text-right">${transaction.amount.toFixed(2)}</TableCell>
+                      {invoices.map(invoice => (
+                        <TableRow key={invoice.id}>
+                          <TableCell className="font-medium">{getStudentName(invoice.studentId)}</TableCell>
+                          <TableCell>{invoice.items.map(item => getAccountTitleName(item.accountTitleId)).join(', ')}</TableCell>
+                          <TableCell>{invoice.date}</TableCell>
+                          <TableCell className="text-right">${getInvoiceTotal(invoice.items).toFixed(2)}</TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild><Button size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                               <DropdownMenuContent>
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => handleOpenSlipModal(transaction)}><FileText className="mr-2 h-4 w-4" /> View Slip</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleOpenTransactionModal(transaction)}>Edit</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'transaction', id: transaction.id })}>Delete</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleOpenSlipModal(invoice)}><FileText className="mr-2 h-4 w-4" /> View Slip</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleOpenInvoiceModal(invoice)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'invoice', id: invoice.id })}>Delete</DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
@@ -344,18 +388,70 @@ export default function AccountingPage() {
         </CardContent>
       </Card>
 
-      {/* Add/Edit Transaction Modal */}
-      <Dialog open={isTransactionModalOpen} onOpenChange={setTransactionModalOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}</DialogTitle></DialogHeader>
-          <form onSubmit={handleTransactionSubmit} key={editingTransaction ? editingTransaction.id : 'add-transaction'}>
+      {/* Add/Edit Invoice Modal */}
+      <Dialog open={isInvoiceModalOpen} onOpenChange={setInvoiceModalOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader><DialogTitle>{editingInvoice ? 'Edit Invoice' : 'Add New Invoice'}</DialogTitle></DialogHeader>
+          <form onSubmit={handleInvoiceSubmit}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="studentId" className="text-right">Student</Label><Select name="studentId" required defaultValue={editingTransaction?.studentId}><SelectTrigger className="col-span-3"><SelectValue placeholder="Select a student" /></SelectTrigger><SelectContent>{students.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select></div>
-              <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="accountTitleId" className="text-right">Payment For</Label><Select name="accountTitleId" required defaultValue={editingTransaction?.accountTitleId}><SelectTrigger className="col-span-3"><SelectValue placeholder="Select a payment type" /></SelectTrigger><SelectContent>{incomeAccountTitles.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select></div>
-              <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="amount" className="text-right">Amount</Label><Input id="amount" name="amount" type="number" step="0.01" className="col-span-3" required defaultValue={editingTransaction?.amount} /></div>
-              <div className="grid grid-cols-4 items-start gap-4"><Label htmlFor="description" className="text-right pt-2">Description</Label><Textarea id="description" name="description" className="col-span-3" defaultValue={editingTransaction?.description} /></div>
+              <div className="grid grid-cols-6 items-center gap-4">
+                <Label htmlFor="studentId" className="text-right">Student</Label>
+                <Select name="studentId" required value={invoiceStudentId} onValueChange={setInvoiceStudentId}>
+                    <SelectTrigger className="col-span-5"><SelectValue placeholder="Select a student" /></SelectTrigger>
+                    <SelectContent>{students.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2 pt-4">
+                <Label>Invoice Items</Label>
+                <div className="border rounded-md">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[40%]">Payment For</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead className="w-[120px]">Amount</TableHead>
+                                <TableHead className="w-[50px]"></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {invoiceItems.map((item, index) => (
+                                <TableRow key={item.id} className="align-top">
+                                    <TableCell className="p-1">
+                                        <Select value={item.accountTitleId} onValueChange={(value) => handleItemChange(index, 'accountTitleId', value)} required>
+                                            <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                                            <SelectContent>{incomeAccountTitles.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                                        </Select>
+                                    </TableCell>
+                                    <TableCell className="p-1">
+                                        <Input value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
+                                    </TableCell>
+                                    <TableCell className="p-1">
+                                        <Input type="number" step="0.01" value={item.amount} onChange={(e) => handleItemChange(index, 'amount', e.target.value)} required />
+                                    </TableCell>
+                                    <TableCell className="p-1">
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(index)} disabled={invoiceItems.length <= 1}>
+                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                 <Button type="button" size="sm" variant="outline" onClick={handleAddItem} className="mt-2">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Item
+                </Button>
+              </div>
+
             </div>
-            <DialogFooter><Button type="button" variant="outline" onClick={() => setTransactionModalOpen(false)}>Cancel</Button><Button type="submit">Save Transaction</Button></DialogFooter>
+            <DialogFooter className="pt-4">
+                <div className="flex-1 text-lg font-bold">
+                    Total: ${getInvoiceTotal(invoiceItems).toFixed(2)}
+                </div>
+                <Button type="button" variant="outline" onClick={() => setInvoiceModalOpen(false)}>Cancel</Button>
+                <Button type="submit">Save Invoice</Button>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
@@ -381,21 +477,21 @@ export default function AccountingPage() {
                     </Button>
                 </div>
             </DialogHeader>
-            {viewingTransaction && (() => {
-                const student = getStudentDetails(viewingTransaction.studentId);
+            {viewingInvoice && (() => {
+                const student = getStudentDetails(viewingInvoice.studentId);
                 return (
                     <div className="py-4 space-y-4">
                         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                             <div><strong>Student:</strong> {student?.name || 'N/A'}</div>
-                            <div><strong>Student ID:</strong> {viewingTransaction.studentId}</div>
+                            <div><strong>Student ID:</strong> viewingInvoice.studentId}</div>
                             {student && (
                                 <>
                                     <div><strong>Class:</strong> {student.grade}</div>
                                     <div><strong>Section:</strong> {student.section}</div>
                                 </>
                             )}
-                            <div><strong>Date:</strong> {format(new Date(viewingTransaction.date), 'MMMM dd, yyyy')}</div>
-                            <div><strong>Transaction ID:</strong> {viewingTransaction.id}</div>
+                            <div><strong>Date:</strong> {format(new Date(viewingInvoice.date), 'MMMM dd, yyyy')}</div>
+                            <div><strong>Invoice ID:</strong> {viewingInvoice.id}</div>
                         </div>
                         <Table>
                             <TableHeader>
@@ -405,20 +501,20 @@ export default function AccountingPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell>{getAccountTitleName(viewingTransaction.accountTitleId)}</TableCell>
-                                    <TableCell className="text-right">${viewingTransaction.amount.toFixed(2)}</TableCell>
+                                {viewingInvoice.items.map(item => (
+                                <TableRow key={item.id}>
+                                    <TableCell>
+                                        <div>{getAccountTitleName(item.accountTitleId)}</div>
+                                        {item.description && <div className="text-xs text-muted-foreground">{item.description}</div>}
+                                    </TableCell>
+                                    <TableCell className="text-right">${item.amount.toFixed(2)}</TableCell>
                                 </TableRow>
-                                 {viewingTransaction.description && (
-                                     <TableRow>
-                                         <TableCell className="text-xs text-muted-foreground pt-0" colSpan={2}>{viewingTransaction.description}</TableCell>
-                                     </TableRow>
-                                 )}
+                                ))}
                             </TableBody>
                             <TableFooter>
                                 <TableRow className="font-bold text-base bg-muted/50">
                                     <TableCell>Total Paid</TableCell>
-                                    <TableCell className="text-right">${viewingTransaction.amount.toFixed(2)}</TableCell>
+                                    <TableCell className="text-right">${getInvoiceTotal(viewingInvoice.items).toFixed(2)}</TableCell>
                                 </TableRow>
                             </TableFooter>
                         </Table>
