@@ -59,7 +59,7 @@ const getTeacherClassAndSubjects = () => {
 };
 
 type AttendanceStatus = 'Present' | 'Absent';
-type AttendanceRecord = { studentId: string; status: AttendanceStatus };
+type AttendanceRecord = { studentId: string; status: AttendanceStatus; id?: string };
 
 export default function TeacherExamAttendancePage() {
     const [teacherClassesAndSubjects] = useState(getTeacherClassAndSubjects());
@@ -94,6 +94,7 @@ export default function TeacherExamAttendancePage() {
                 return {
                     studentId: student.id,
                     status: (existingRecord?.status as AttendanceStatus) || 'Present',
+                    id: existingRecord?.id,
                 };
             });
             setAttendanceRecords(loadedAttendances);
@@ -127,23 +128,34 @@ export default function TeacherExamAttendancePage() {
             return;
         }
         
-        const otherAttendances = attendances.filter(att => 
-            !(att.examId === selectedExam && att.subjectId === subjectId && studentList.some(s => s.id === att.studentId))
-        );
+        const updatedAttendances = [...attendances];
+
+        attendanceRecords.forEach(record => {
+            const existingRecordIndex = updatedAttendances.findIndex(att => att.id === record.id);
+            
+            if (existingRecordIndex > -1) {
+                // Update existing record
+                updatedAttendances[existingRecordIndex].status = record.status;
+            } else {
+                // Add new record if it doesn't exist
+                const alreadyExists = updatedAttendances.some(att => att.studentId === record.studentId && att.examId === selectedExam && att.subjectId === subjectId);
+                if (!alreadyExists) {
+                    updatedAttendances.push({
+                        id: `ESA${Date.now()}${record.studentId}`,
+                        studentId: record.studentId,
+                        examId: selectedExam,
+                        subjectId,
+                        status: record.status,
+                    });
+                }
+            }
+        });
         
-        const newAttendanceRecords = attendanceRecords.map(att => ({
-            id: `ESA${Date.now()}${att.studentId}`,
-            studentId: att.studentId,
-            examId: selectedExam,
-            subjectId,
-            status: att.status,
-        }));
-        
-        setAttendances([...otherAttendances, ...newAttendanceRecords]);
+        setAttendances(updatedAttendances);
 
         toast({
-            title: 'Exam Attendance Saved',
-            description: `Attendance for ${getExamName(selectedExam)} - ${selectedSubject} has been successfully saved.`,
+            title: 'Exam Attendance Updated',
+            description: `Attendance for ${getExamName(selectedExam)} - ${selectedSubject} has been successfully updated.`,
         });
     };
     
@@ -153,7 +165,7 @@ export default function TeacherExamAttendancePage() {
         <Card>
             <CardHeader>
                 <CardTitle>Exam Attendance</CardTitle>
-                <CardDescription>Take and manage student attendance for examinations.</CardDescription>
+                <CardDescription>Take, view, and modify student attendance for examinations.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="flex flex-wrap items-end gap-4 mb-6">
