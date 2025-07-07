@@ -63,6 +63,7 @@ const menuItems = [
   { href: '/student-dashboard/my-class', label: 'My Class', icon: BookCopy },
   { href: '/student-dashboard/exam-routine', label: 'Exam Routine', icon: ClipboardList },
   { href: '/student-dashboard/grades', label: 'Grades', icon: GraduationCap },
+  { href: '/student-dashboard/results', label: 'My Results', icon: BookCheck },
   { href: '/student-dashboard/subjects', label: 'Subjects', icon: Library },
   { href: '/student-dashboard/teachers', label: 'Teachers', icon: Contact },
   { href: '/student-dashboard/noticeboard', label: 'Noticeboard', icon: Megaphone },
