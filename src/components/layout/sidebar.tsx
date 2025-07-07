@@ -30,6 +30,7 @@ import {
   Bus,
   DollarSign,
   User,
+  Settings,
 } from 'lucide-react';
 
 const menuItems = [
@@ -48,6 +49,7 @@ const menuItems = [
   { href: '/accounting', label: 'Accounting', icon: DollarSign },
   { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/admin', label: 'Admin', icon: Shield },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function AppSidebar() {

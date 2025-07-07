@@ -236,3 +236,11 @@ export const adminProfile = {
   address: '123 Admin Way, Tech City, 10101',
   profilePicture: 'https://placehold.co/100x100.png'
 };
+
+export const settings = {
+  name: 'CampusFlow School',
+  email: 'contact@campusflow.com',
+  phone: '555-123-4567',
+  address: '123 Education Lane, Knowledge City, 12345',
+  logo: 'https://placehold.co/100x100.png'
+};
