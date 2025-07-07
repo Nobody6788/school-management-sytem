@@ -217,9 +217,11 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
            <SidebarMenuItem>
-              <SidebarMenuButton icon={<LogOut />}>
-                Logout
-              </SidebarMenuButton>
+              <Link href="/login" legacyBehavior passHref>
+                <SidebarMenuButton icon={<LogOut />}>
+                  Logout
+                </SidebarMenuButton>
+              </Link>
            </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
