@@ -7,11 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { settings as initialSettings } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Camera } from 'lucide-react';
 
 type SchoolSettings = typeof initialSettings;
+
+const timezones = [
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'Europe/London',
+  'Europe/Berlin',
+  'Asia/Tokyo',
+  'Australia/Sydney',
+];
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<SchoolSettings>({ ...initialSettings });
@@ -22,6 +34,10 @@ export default function SettingsPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSettings((prev) => ({ ...prev, [name]: value }));
+  };
+  
+  const handleTimezoneChange = (value: string) => {
+    setSettings((prev) => ({ ...prev, timezone: value }));
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,6 +124,26 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="address">School Address</Label>
               <Input id="address" name="address" value={settings.address} onChange={handleInputChange} disabled={!isEditing} />
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="timezone">Time Zone</Label>
+              <Select
+                name="timezone"
+                value={settings.timezone}
+                onValueChange={handleTimezoneChange}
+                disabled={!isEditing}
+              >
+                <SelectTrigger id="timezone">
+                  <SelectValue placeholder="Select a time zone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timezones.map((tz) => (
+                    <SelectItem key={tz} value={tz}>
+                      {tz.replace('_', ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>

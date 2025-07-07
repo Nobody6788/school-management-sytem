@@ -242,5 +242,6 @@ export const settings = {
   email: 'contact@campusflow.com',
   phone: '555-123-4567',
   address: '123 Education Lane, Knowledge City, 12345',
-  logo: 'https://placehold.co/100x100.png'
+  logo: 'https://placehold.co/100x100.png',
+  timezone: 'America/New_York',
 };
