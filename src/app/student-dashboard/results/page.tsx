@@ -2,12 +2,14 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -24,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { FileText } from 'lucide-react';
 import { academic, students } from '@/lib/data';
 
 // Mocking the logged-in student
@@ -127,6 +131,14 @@ export default function StudentResultsPage() {
           </TableBody>
         </Table>
       </CardContent>
+      <CardFooter>
+        <Button asChild className="w-full">
+          <Link href={`/students/${loggedInStudent.id}/marksheet`}>
+            <FileText className="mr-2 h-4 w-4" />
+            View Official Mark Sheet
+          </Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
