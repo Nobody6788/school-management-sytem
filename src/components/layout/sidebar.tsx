@@ -47,6 +47,7 @@ const menuItems = [
   { href: '/teacher-dashboard/teachers', label: 'Teachers', icon: Contact },
   { href: '/teacher-dashboard/attendance', label: 'Attendance', icon: ClipboardPenLine },
   { href: '/teacher-dashboard/exam-attendance', label: 'Exam Attendance', icon: FilePenLine },
+  { href: '/teacher-dashboard/grades', label: 'Grades', icon: GraduationCap },
   { href: '/teacher-dashboard/noticeboard', label: 'Noticeboard', icon: Megaphone },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/calendar', label: 'My Calendar', icon: CalendarPlus },
