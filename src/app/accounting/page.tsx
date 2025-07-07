@@ -84,6 +84,7 @@ export default function AccountingPage() {
 
   const getTypeName = (typeId: string) => accountTypes.find(t => t.id === typeId)?.name || 'N/A';
   const getStudentName = (studentId: string) => students.find(s => s.id === studentId)?.name || 'N/A';
+  const getStudentDetails = (studentId: string) => students.find(s => s.id === studentId);
   const getAccountTitleName = (titleId: string) => accountTitles.find(t => t.id === titleId)?.name || 'N/A';
 
   const incomeAccountTitles = accountTitles.filter(t => t.typeId === 'AT01');
@@ -380,44 +381,53 @@ export default function AccountingPage() {
                     </Button>
                 </div>
             </DialogHeader>
-            {viewingTransaction && (
-                <div className="py-4 space-y-4">
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                        <div><strong>Student:</strong> {getStudentName(viewingTransaction.studentId)}</div>
-                        <div><strong>Student ID:</strong> {viewingTransaction.studentId}</div>
-                        <div><strong>Date:</strong> {format(new Date(viewingTransaction.date), 'MMMM dd, yyyy')}</div>
-                        <div><strong>Transaction ID:</strong> {viewingTransaction.id}</div>
+            {viewingTransaction && (() => {
+                const student = getStudentDetails(viewingTransaction.studentId);
+                return (
+                    <div className="py-4 space-y-4">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                            <div><strong>Student:</strong> {student?.name || 'N/A'}</div>
+                            <div><strong>Student ID:</strong> {viewingTransaction.studentId}</div>
+                            {student && (
+                                <>
+                                    <div><strong>Class:</strong> {student.grade}</div>
+                                    <div><strong>Section:</strong> {student.section}</div>
+                                </>
+                            )}
+                            <div><strong>Date:</strong> {format(new Date(viewingTransaction.date), 'MMMM dd, yyyy')}</div>
+                            <div><strong>Transaction ID:</strong> {viewingTransaction.id}</div>
+                        </div>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead className="text-right">Amount</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>{getAccountTitleName(viewingTransaction.accountTitleId)}</TableCell>
+                                    <TableCell className="text-right">${viewingTransaction.amount.toFixed(2)}</TableCell>
+                                </TableRow>
+                                 {viewingTransaction.description && (
+                                     <TableRow>
+                                         <TableCell className="text-xs text-muted-foreground pt-0" colSpan={2}>{viewingTransaction.description}</TableCell>
+                                     </TableRow>
+                                 )}
+                            </TableBody>
+                            <TableFooter>
+                                <TableRow className="font-bold text-base bg-muted/50">
+                                    <TableCell>Total Paid</TableCell>
+                                    <TableCell className="text-right">${viewingTransaction.amount.toFixed(2)}</TableCell>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
+                         <div className="text-center pt-8">
+                            <p className="font-bold text-green-600 text-2xl tracking-widest">PAID</p>
+                        </div>
                     </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Description</TableHead>
-                                <TableHead className="text-right">Amount</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>{getAccountTitleName(viewingTransaction.accountTitleId)}</TableCell>
-                                <TableCell className="text-right">${viewingTransaction.amount.toFixed(2)}</TableCell>
-                            </TableRow>
-                             {viewingTransaction.description && (
-                                 <TableRow>
-                                     <TableCell className="text-xs text-muted-foreground pt-0" colSpan={2}>{viewingTransaction.description}</TableCell>
-                                 </TableRow>
-                             )}
-                        </TableBody>
-                        <TableFooter>
-                            <TableRow className="font-bold text-base bg-muted/50">
-                                <TableCell>Total Paid</TableCell>
-                                <TableCell className="text-right">${viewingTransaction.amount.toFixed(2)}</TableCell>
-                            </TableRow>
-                        </TableFooter>
-                    </Table>
-                     <div className="text-center pt-8">
-                        <p className="font-bold text-green-600 text-2xl tracking-widest">PAID</p>
-                    </div>
-                </div>
-            )}
+                )
+            })()}
         </DialogContent>
       </Dialog>
 
