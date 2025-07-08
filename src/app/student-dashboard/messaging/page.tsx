@@ -18,15 +18,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from '@/components/ui/select';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -54,6 +45,8 @@ import { Eye, Send, Trash2, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { messages as initialMessages, teachers, students, adminProfile } from '@/lib/data';
+import type { ComboboxOption } from '@/components/ui/combobox';
+import { Combobox } from '@/components/ui/combobox';
 
 type Message = (typeof initialMessages)[0];
 
@@ -66,6 +59,7 @@ export default function StudentMessagingPage() {
     const [viewingMessage, setViewingMessage] = useState<Message | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Message | null>(null);
     const { toast } = useToast();
+    const [recipient, setRecipient] = useState('');
 
     if (!loggedInStudent) {
         return (
@@ -91,6 +85,11 @@ export default function StudentMessagingPage() {
             default: return 'Unknown';
         }
     };
+    
+    const recipientOptions: ComboboxOption[] = [
+        ...teachers.map(t => ({ value: `Teacher:${t.id}`, label: `${t.name} (Teacher)` })),
+        ...classmates.map(s => ({ value: `Student:${s.id}`, label: `${s.name} (Classmate)` })),
+    ].sort((a,b) => (a.label as string).localeCompare(b.label as string));
 
     const inboxMessages = messages
         .filter(m => m.recipientId === loggedInStudent.id && m.recipientType === 'Student')
@@ -120,9 +119,9 @@ export default function StudentMessagingPage() {
     const handleNewMessageSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        const recipientData = (formData.get('recipient') as string)?.split(':');
+        const recipientData = recipient?.split(':');
         
-        if (!recipientData || recipientData.length < 2) {
+        if (!recipient || !recipientData || recipientData.length < 2) {
              toast({ variant: 'destructive', title: 'Error', description: 'Please select a valid recipient.' });
             return;
         }
@@ -147,6 +146,7 @@ export default function StudentMessagingPage() {
         toast({ title: 'Message Sent!', description: `Your message to ${getParticipantName(recipientType, recipientId)} has been sent.` });
         
         (event.target as HTMLFormElement).reset();
+        setRecipient('');
         setActiveTab('sent');
     };
 
@@ -229,19 +229,15 @@ export default function StudentMessagingPage() {
                             <form onSubmit={handleNewMessageSubmit} className="space-y-4 pt-4">
                                 <div className="grid grid-cols-6 items-center gap-4">
                                     <Label htmlFor="recipient" className="text-right">Recipient</Label>
-                                    <Select name="recipient" required>
-                                        <SelectTrigger className="col-span-5" id="recipient"><SelectValue placeholder="Select a recipient" /></SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectLabel>Teachers</SelectLabel>
-                                                {teachers.map(t => <SelectItem key={t.id} value={`Teacher:${t.id}`}>{t.name}</SelectItem>)}
-                                            </SelectGroup>
-                                            <SelectGroup>
-                                                <SelectLabel>Classmates</SelectLabel>
-                                                {classmates.map(s => <SelectItem key={s.id} value={`Student:${s.id}`}>{s.name}</SelectItem>)}
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
+                                    <div className="col-span-5">
+                                        <Combobox
+                                            options={recipientOptions}
+                                            value={recipient}
+                                            onValueChange={setRecipient}
+                                            placeholder="Search for a teacher or classmate..."
+                                            emptyMessage="No recipient found."
+                                        />
+                                    </div>
                                 </div>
                                  <div className="grid grid-cols-6 items-center gap-4">
                                     <Label htmlFor="subject" className="text-right">Subject</Label>
