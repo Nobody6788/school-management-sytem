@@ -103,6 +103,7 @@ const adminMenu = {
         { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
         { href: '/results', label: 'Manage Results', icon: BookCheck },
         { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
+        { href: '/messaging', label: 'Messaging', icon: MessageSquare },
         { href: '/library', label: 'Library', icon: Library },
         { href: '/transport', label: 'Transport', icon: Bus },
         { href: '/dormitories', label: 'Dormitories', icon: BedDouble },
