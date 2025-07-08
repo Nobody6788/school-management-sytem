@@ -54,27 +54,69 @@ import {
 } from 'lucide-react';
 
 
+const NestedCollapsibleMenu = ({ item, pathname }: { item: any; pathname: string }) => {
+  const isChildActive = item.children.some((link: any) => pathname.startsWith(link.href));
+  const [isOpen, setIsOpen] = React.useState(isChildActive);
+  const ItemIcon = item.icon;
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
+      <CollapsibleTrigger asChild>
+        <SidebarMenuButton className="justify-between w-full">
+          <div className="flex items-center gap-2">
+            <ItemIcon />
+            <span>{item.label}</span>
+          </div>
+          <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`} />
+        </SidebarMenuButton>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <SidebarMenu className="pl-4 pt-1">
+          {item.children.map((link: any) => (
+            <SidebarMenuItem key={link.href}>
+              <Link href={link.href} legacyBehavior passHref>
+                <SidebarMenuButton
+                  isActive={pathname === link.href}
+                  icon={<link.icon />}
+                >
+                  {link.label}
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+};
+
 const adminMenu = {
     title: "Admin",
     icon: Shield,
     links: [
-        { href: '/admin', label: 'Academic Setup', icon: Shield },
+        { href: '/admin', label: 'Academic Setup', icon: School },
         { href: '/students', label: 'Students', icon: Users },
         { href: '/teachers', label: 'Teachers', icon: BookUser },
         { href: '/parents', label: 'Parents', icon: Contact },
-        { href: '/schedule', label: 'Schedule', icon: CalendarDays },
+        { href: '/schedule', label: 'Class Schedule', icon: CalendarDays },
         { href: '/attendance', label: 'Attendance', icon: UserCheck },
         { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
-        { href: '/grades', label: 'Grades', icon: GraduationCap },
-        { href: '/results', label: 'Results', icon: BookCheck },
+        { href: '/results', label: 'Manage Results', icon: BookCheck },
         { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
         { href: '/library', label: 'Library', icon: Library },
         { href: '/transport', label: 'Transport', icon: Bus },
         { href: '/dormitories', label: 'Dormitories', icon: BedDouble },
-        { href: '/accounting', label: 'Accounting', icon: DollarSign },
         { href: '/calendar', label: 'Events Calendar', icon: CalendarPlus },
-        { href: '/profile', label: 'My Profile', icon: User },
-        { href: '/settings', label: 'Settings', icon: Settings },
+        {
+            label: "General Settings",
+            icon: Settings,
+            children: [
+                { href: '/settings', label: 'Institute Profile', icon: School },
+                { href: '/accounting', label: 'Fees Particulars', icon: DollarSign },
+                { href: '/grades', label: 'Marks Grading', icon: GraduationCap },
+                { href: '/profile', label: 'Account Settings', icon: User },
+            ]
+        }
     ]
 };
 
@@ -146,10 +188,17 @@ const CollapsibleSidebarMenu = ({
   menu,
   pathname,
 }: {
-  menu: { title: string; icon: React.ElementType; links: { href: string; label: string; icon: React.ElementType }[] };
+  menu: { title: string; icon: React.ElementType; links: any[] };
   pathname: string;
 }) => {
-  const [isOpen, setIsOpen] = React.useState(menu.links.some(link => pathname.startsWith(link.href) && (link.href !== '/' || pathname === '/')));
+  const isMenuActive = menu.links.some(link => {
+    if (link.children) {
+      return link.children.some((child: any) => pathname.startsWith(child.href));
+    }
+    return link.href ? pathname.startsWith(link.href) && (link.href !== '/' || pathname === '/') : false;
+  });
+
+  const [isOpen, setIsOpen] = React.useState(isMenuActive);
   const TitleIcon = menu.icon;
   
   return (
@@ -166,15 +215,19 @@ const CollapsibleSidebarMenu = ({
       <CollapsibleContent>
         <SidebarMenu className="pl-4 pt-1">
           {menu.links.map((link) => (
-            <SidebarMenuItem key={link.href}>
-              <Link href={link.href} legacyBehavior passHref>
-                <SidebarMenuButton
-                  isActive={pathname === link.href}
-                  icon={<link.icon />}
-                >
-                  {link.label}
-                </SidebarMenuButton>
-              </Link>
+            <SidebarMenuItem key={link.href || link.label}>
+              {link.children ? (
+                 <NestedCollapsibleMenu item={link} pathname={pathname} />
+              ) : (
+                <Link href={link.href!} legacyBehavior passHref>
+                  <SidebarMenuButton
+                    isActive={pathname === link.href}
+                    icon={<link.icon />}
+                  >
+                    {link.label}
+                  </SidebarMenuButton>
+                </Link>
+              )}
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
