@@ -47,6 +47,7 @@ import { format } from 'date-fns';
 import { messages as initialMessages, teachers, students, adminProfile } from '@/lib/data';
 import type { ComboboxOption } from '@/components/ui/combobox';
 import { Combobox } from '@/components/ui/combobox';
+import { sendEmail } from '@/ai/flows/send-email-flow';
 
 type Message = (typeof initialMessages)[0];
 
@@ -76,14 +77,22 @@ export default function StudentMessagingPage() {
     
     const classmates = students.filter(s => s.grade === loggedInStudent.grade && s.section === loggedInStudent.section && s.id !== loggedInStudent.id);
 
-    const getParticipantName = (type: string, id: string): string => {
+    const getParticipantInfo = (type: string, id: string): { name: string; email?: string } => {
         switch (type) {
-            case 'Admin': return adminProfile.name;
-            case 'Teacher': return teachers.find(t => t.id === id)?.name || 'Unknown Teacher';
-            case 'Student': return students.find(s => s.id === id)?.name || 'Unknown Student';
-            case 'Parent': return 'A Parent'; // Students don't message parents directly
-            default: return 'Unknown';
+            case 'Admin': return { name: adminProfile.name, email: adminProfile.email };
+            case 'Teacher': 
+                const teacher = teachers.find(t => t.id === id);
+                return { name: teacher?.name || 'Unknown Teacher', email: teacher?.email };
+            case 'Student': 
+                const student = students.find(s => s.id === id);
+                return { name: student?.name || 'Unknown Student', email: student?.email };
+            case 'Parent': return { name: 'A Parent', email: undefined };
+            default: return { name: 'Unknown', email: undefined };
         }
+    };
+    
+    const getParticipantName = (type: string, id: string): string => {
+        return getParticipantInfo(type, id).name;
     };
     
     const recipientOptions: ComboboxOption[] = [
@@ -116,7 +125,7 @@ export default function StudentMessagingPage() {
         toast({ title: 'Message Deleted', description: 'The message has been removed.' });
     };
     
-    const handleNewMessageSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleNewMessageSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const recipientData = recipient?.split(':');
@@ -143,7 +152,23 @@ export default function StudentMessagingPage() {
         };
 
         setMessages(prev => [newMessage, ...prev]);
-        toast({ title: 'Message Sent!', description: `Your message to ${getParticipantName(recipientType, recipientId)} has been sent.` });
+
+        const recipientInfo = getParticipantInfo(recipientType, recipientId);
+        if (recipientInfo.email) {
+            try {
+                await sendEmail({
+                    to: recipientInfo.email,
+                    subject: `[CampusFlow] ${subject}`,
+                    body: `You have received a new message from ${loggedInStudent.name}.\n\n---\n\n${body}\n\n---\n\nPlease log in to CampusFlow to view and reply.`
+                });
+                toast({ title: 'Message Sent & Emailed!', description: `Your message to ${recipientInfo.name} has been sent and an email notification was dispatched.` });
+            } catch (error) {
+                console.error("Email sending failed", error);
+                toast({ variant: 'destructive', title: 'Message Sent (Email Failed)', description: 'The message was stored, but the email notification failed.' });
+            }
+        } else {
+            toast({ title: 'Message Sent!', description: `Your message to ${recipientInfo.name} has been sent.` });
+        }
         
         (event.target as HTMLFormElement).reset();
         setRecipient('');
