@@ -51,6 +51,7 @@ import {
   UserSquare,
   UsersRound,
   ChevronRight,
+  Clipboard,
 } from 'lucide-react';
 
 
@@ -100,6 +101,7 @@ const adminMenu = {
         { href: '/parents', label: 'Parents', icon: Contact },
         { href: '/schedule', label: 'Class Schedule', icon: CalendarDays },
         { href: '/attendance', label: 'Attendance', icon: UserCheck },
+        { href: '/staff-attendance', label: 'Staff Attendance', icon: Clipboard },
         { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
         { href: '/results', label: 'Manage Results', icon: BookCheck },
         { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },

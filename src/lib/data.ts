@@ -1,5 +1,6 @@
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -260,6 +261,15 @@ export const examStudentAttendances = [
   { id: 'ESA01', studentId: 'S001', examId: 'EXM01', subjectId: 'SUB04', status: 'Present' },
   { id: 'ESA02', studentId: 'S005', examId: 'EXM01', subjectId: 'SUB04', status: 'Present' },
   { id: 'ESA03', studentId: 'S001', examId: 'EXM01', subjectId: 'SUB05', status: 'Absent' },
+];
+
+export const staffAttendances = [
+    { id: 'SATT01', teacherId: 'T01', date: '2024-10-21', status: 'Present' },
+    { id: 'SATT02', teacherId: 'T02', date: '2024-10-21', status: 'Present' },
+    { id: 'SATT03', teacherId: 'T03', date: '2024-10-21', status: 'Late' },
+    { id: 'SATT04', teacherId: 'T04', date: '2024-10-21', status: 'Absent' },
+    { id: 'SATT05', teacherId: 'T05', date: '2024-10-21', status: 'Present' },
+    { id: 'SATT06', teacherId: 'T01', date: '2024-10-22', status: 'Present' },
 ];
 
 export const adminProfile = {
