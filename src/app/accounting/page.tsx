@@ -62,6 +62,7 @@ import { format } from 'date-fns';
 
 type AccountType = (typeof accounting.accountTypes)[0];
 type AccountTitle = (typeof accounting.accountTitles)[0];
+type Expense = (typeof accounting.expenses)[0];
 type InvoiceItem = {
   id: string;
   accountTitleId: string;
@@ -81,22 +82,25 @@ export default function AccountingPage() {
   const [accountTypes, setAccountTypes] = useState(accounting.accountTypes);
   const [accountTitles, setAccountTitles] = useState(accounting.accountTitles);
   const [invoices, setInvoices] = useState(accounting.invoices);
+  const [expenses, setExpenses] = useState(accounting.expenses);
 
   const [isTypeModalOpen, setTypeModalOpen] = useState(false);
   const [isTitleModalOpen, setTitleModalOpen] = useState(false);
   const [isInvoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [isSlipModalOpen, setSlipModalOpen] = useState(false);
+  const [isExpenseModalOpen, setExpenseModalOpen] = useState(false);
 
   const [editingType, setEditingType] = useState<AccountType | null>(null);
   const [editingTitle, setEditingTitle] = useState<AccountTitle | null>(null);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   
   const [invoiceStudentId, setInvoiceStudentId] = useState('');
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
 
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null);
 
-  const [deleteTarget, setDeleteTarget] = useState<{ type: 'type' | 'title' | 'invoice'; id: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'type' | 'title' | 'invoice' | 'expense'; id: string } | null>(null);
 
   const getTypeName = (typeId: string) => accountTypes.find(t => t.id === typeId)?.name || 'N/A';
   const getStudentName = (studentId: string) => students.find(s => s.id === studentId)?.name || 'N/A';
@@ -105,6 +109,7 @@ export default function AccountingPage() {
   const getInvoiceTotal = (items: InvoiceItem[]) => items.reduce((total, item) => total + (item.amount || 0), 0);
 
   const incomeAccountTitles = accountTitles.filter(t => t.typeId === 'AT01');
+  const expenseAccountTitles = accountTitles.filter(t => t.typeId === 'AT02');
 
   const handleOpenTypeModal = (type: AccountType | null) => {
     setEditingType(type);
@@ -207,6 +212,33 @@ export default function AccountingPage() {
     setEditingInvoice(null);
   };
 
+  const handleOpenExpenseModal = (expense: Expense | null) => {
+    setEditingExpense(expense);
+    setExpenseModalOpen(true);
+  };
+
+  const handleExpenseSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const data = {
+        accountTitleId: formData.get('accountTitleId') as string,
+        amount: parseFloat(formData.get('amount') as string),
+        description: formData.get('description') as string,
+        date: format(new Date(), 'yyyy-MM-dd')
+    };
+
+    if (data.accountTitleId && data.amount > 0) {
+        if (editingExpense) {
+            setExpenses(expenses.map(e => e.id === editingExpense.id ? { ...editingExpense, ...data } : e));
+        } else {
+            setExpenses([...expenses, { id: `EXP${(expenses.length + 1).toString().padStart(3, '0')}`, ...data }]);
+        }
+        setExpenseModalOpen(false);
+        setEditingExpense(null);
+    }
+  };
+
+
   const handleOpenSlipModal = (invoice: Invoice) => {
     setViewingInvoice(invoice);
     setSlipModalOpen(true);
@@ -222,6 +254,8 @@ export default function AccountingPage() {
       setAccountTitles(accountTitles.filter(t => t.id !== deleteTarget.id));
     } else if (deleteTarget.type === 'invoice') {
         setInvoices(invoices.filter(t => t.id !== deleteTarget.id));
+    } else if (deleteTarget.type === 'expense') {
+        setExpenses(expenses.filter(e => e.id !== deleteTarget.id));
     }
 
     setDeleteTarget(null);
@@ -233,6 +267,7 @@ export default function AccountingPage() {
         case 'type': return 'This will permanently delete the account type and all associated account titles.';
         case 'title': return 'This action cannot be undone and will permanently delete this account title.';
         case 'invoice': return 'This action cannot be undone and will permanently delete this invoice record.';
+        case 'expense': return 'This action cannot be undone and will permanently delete this expense record.';
         default: return 'This action is permanent.';
     }
   }
@@ -250,8 +285,9 @@ export default function AccountingPage() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="transactions">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="transactions">Invoices</TabsTrigger>
+              <TabsTrigger value="expenses">Expenses</TabsTrigger>
               <TabsTrigger value="titles">Account Titles</TabsTrigger>
               <TabsTrigger value="types">Account Types</TabsTrigger>
             </TabsList>
@@ -301,6 +337,52 @@ export default function AccountingPage() {
                   </Table>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="expenses">
+                <Card>
+                    <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle>Expenses</CardTitle>
+                            <Button size="sm" onClick={() => handleOpenExpenseModal(null)}>
+                                <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Paid For</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead className="text-right">Amount</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {expenses.map(expense => (
+                                    <TableRow key={expense.id}>
+                                        <TableCell>{expense.date}</TableCell>
+                                        <TableCell className="font-medium">{getAccountTitleName(expense.accountTitleId)}</TableCell>
+                                        <TableCell>{expense.description}</TableCell>
+                                        <TableCell className="text-right">${expense.amount.toFixed(2)}</TableCell>
+                                        <TableCell className="text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild><Button size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                    <DropdownMenuItem onClick={() => handleOpenExpenseModal(expense)}>Edit</DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'expense', id: expense.id })}>Delete</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             </TabsContent>
             
             <TabsContent value="titles">
@@ -483,7 +565,7 @@ export default function AccountingPage() {
                     <div className="py-4 space-y-4">
                         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                             <div><strong>Student:</strong> {student?.name || 'N/A'}</div>
-                            <div><strong>Student ID:</strong> viewingInvoice.studentId}</div>
+                            <div><strong>Student ID:</strong> {viewingInvoice.studentId}</div>
                             {student && (
                                 <>
                                     <div><strong>Class:</strong> {student.grade}</div>
@@ -524,6 +606,36 @@ export default function AccountingPage() {
                     </div>
                 )
             })()}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add/Edit Expense Modal */}
+      <Dialog open={isExpenseModalOpen} onOpenChange={setExpenseModalOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{editingExpense ? 'Edit Expense' : 'Add New Expense'}</DialogTitle></DialogHeader>
+          <form onSubmit={handleExpenseSubmit} key={editingExpense?.id || 'add-expense'}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="accountTitleId" className="text-right">Expense For</Label>
+                <Select name="accountTitleId" required defaultValue={editingExpense?.accountTitleId}>
+                    <SelectTrigger className="col-span-3"><SelectValue placeholder="Select type" /></SelectTrigger>
+                    <SelectContent>{expenseAccountTitles.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="amount" className="text-right">Amount</Label>
+                <Input id="amount" name="amount" type="number" step="0.01" className="col-span-3" required defaultValue={editingExpense?.amount} />
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="description" className="text-right pt-2">Description</Label>
+                <Textarea id="description" name="description" className="col-span-3" defaultValue={editingExpense?.description} />
+              </div>
+            </div>
+            <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setExpenseModalOpen(false)}>Cancel</Button>
+                <Button type="submit">Save Expense</Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

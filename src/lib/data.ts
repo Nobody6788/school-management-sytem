@@ -1,6 +1,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -247,6 +248,10 @@ export const accounting = {
         { id: 'ITEM004', accountTitleId: 'ATL01', amount: 1000, description: 'Admission Fee' }
       ]
     },
+  ],
+  expenses: [
+    { id: 'EXP001', date: '2024-10-15', accountTitleId: 'ATL03', amount: 25000, description: 'Salaries for September' },
+    { id: 'EXP002', date: '2024-10-10', accountTitleId: 'ATL04', amount: 1500, description: 'Electricity and Water bills' },
   ]
 };
 
