@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -38,6 +39,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -58,8 +60,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { MoreHorizontal, PlusCircle, BookCopy, Edit, Trash2 } from 'lucide-react';
 import { academic } from '@/lib/data';
+import { Badge } from '@/components/ui/badge';
 
 type Class = (typeof academic.classes)[0];
 type Section = (typeof academic.sections)[0];
@@ -67,6 +71,7 @@ type Group = (typeof academic.groups)[0];
 type Subject = (typeof academic.subjects)[0];
 type Exam = (typeof academic.exams)[0];
 type ExamRoutine = (typeof academic.examRoutines)[0];
+type Syllabus = (typeof academic.syllabus)[0];
 
 
 export default function AdminPage() {
@@ -76,7 +81,7 @@ export default function AdminPage() {
   const [subjects, setSubjects] = useState(academic.subjects);
   const [exams, setExams] = useState(academic.exams);
   const [examRoutines, setExamRoutines] = useState(academic.examRoutines);
-
+  const [syllabus, setSyllabus] = useState(academic.syllabus);
 
   // Modal states for Add/Edit
   const [isClassModalOpen, setClassModalOpen] = useState(false);
@@ -85,6 +90,8 @@ export default function AdminPage() {
   const [isSubjectModalOpen, setSubjectModalOpen] = useState(false);
   const [isExamModalOpen, setExamModalOpen] = useState(false);
   const [isRoutineModalOpen, setRoutineModalOpen] = useState(false);
+  const [isSyllabusManagerOpen, setSyllabusManagerOpen] = useState(false);
+  const [isSyllabusItemModalOpen, setSyllabusItemModalOpen] = useState(false);
 
 
   // State for item being edited
@@ -94,6 +101,8 @@ export default function AdminPage() {
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [editingRoutine, setEditingRoutine] = useState<ExamRoutine | null>(null);
+  const [managingSyllabusFor, setManagingSyllabusFor] = useState<Subject | null>(null);
+  const [editingSyllabusItem, setEditingSyllabusItem] = useState<Syllabus | null>(null);
 
   const [selectedClassForRoutine, setSelectedClassForRoutine] = useState<string | undefined>(editingRoutine?.classId);
 
@@ -109,6 +118,10 @@ export default function AdminPage() {
   const getExamName = (examId: string) => exams.find(e => e.id === examId)?.name || 'N/A';
   const getClassName = (classId: string) => classes.find(c => c.id === classId)?.name || 'N/A';
   const getSubjectName = (subjectId: string) => subjects.find(s => s.id === subjectId)?.name || 'N/A';
+  
+  const syllabusForCurrentSubject = managingSyllabusFor
+    ? syllabus.filter(s => s.subjectId === managingSyllabusFor.id)
+    : [];
 
   const availableSubjectsForRoutine = selectedClassForRoutine
   ? subjects.filter(s => s.className === getClassName(selectedClassForRoutine))
@@ -277,6 +290,38 @@ export default function AdminPage() {
             setEditingRoutine(null);
         }
     };
+    
+      // --- Handlers for Syllabus ---
+    const handleOpenSyllabusManager = (subject: Subject) => {
+        setManagingSyllabusFor(subject);
+        setSyllabusManagerOpen(true);
+    };
+
+    const handleOpenSyllabusItemModal = (item: Syllabus | null) => {
+        setEditingSyllabusItem(item);
+        setSyllabusItemModalOpen(true);
+    };
+
+    const handleSyllabusItemSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (!managingSyllabusFor) return;
+
+        const formData = new FormData(event.currentTarget);
+        const data = {
+            title: formData.get('title') as string,
+            content: formData.get('content') as string,
+            status: formData.get('status') as 'Pending' | 'In Progress' | 'Completed',
+        };
+
+        if (editingSyllabusItem) {
+            setSyllabus(syllabus.map(s => s.id === editingSyllabusItem.id ? { ...s, ...data } : s));
+        } else {
+            setSyllabus([...syllabus, { id: `SYL${Date.now()}`, subjectId: managingSyllabusFor.id, ...data }]);
+        }
+        setSyllabusItemModalOpen(false);
+        setEditingSyllabusItem(null);
+    };
+
 
   // --- Handler for Deletion ---
   const handleDeleteConfirm = () => {
@@ -299,6 +344,7 @@ export default function AdminPage() {
         setGroups(groups.filter((g) => g.id !== deleteTarget.id));
         break;
       case 'subject':
+        setSyllabus(syllabus.filter(s => s.subjectId !== deleteTarget.id));
         setSubjects(subjects.filter((s) => s.id !== deleteTarget.id));
         break;
       case 'exam':
@@ -307,6 +353,9 @@ export default function AdminPage() {
         break;
       case 'examRoutine':
         setExamRoutines(examRoutines.filter((r) => r.id !== deleteTarget.id));
+        break;
+      case 'syllabusItem':
+        setSyllabus(syllabus.filter(s => s.id !== deleteTarget.id));
         break;
     }
     setDeleteTarget(null);
@@ -505,6 +554,10 @@ export default function AdminPage() {
                           <TableCell>{s.name}</TableCell>
                           <TableCell>{s.className}</TableCell>
                           <TableCell className="text-right">
+                            <Button variant="outline" size="sm" className="mr-2" onClick={() => handleOpenSyllabusManager(s)}>
+                                <BookCopy className="h-4 w-4 mr-2" />
+                                Manage Syllabus
+                            </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button size="icon" variant="ghost">
@@ -873,6 +926,84 @@ export default function AdminPage() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      {/* Syllabus Manager Dialog */}
+      <Dialog open={isSyllabusManagerOpen} onOpenChange={(isOpen) => { if (!isOpen) setManagingSyllabusFor(null); setSyllabusManagerOpen(isOpen); }}>
+        <DialogContent className="sm:max-w-4xl">
+            {managingSyllabusFor && <>
+                <DialogHeader>
+                    <DialogTitle>Manage Syllabus for: {managingSyllabusFor.name}</DialogTitle>
+                    <CardDescription>{managingSyllabusFor.className}</CardDescription>
+                </DialogHeader>
+                <div className="py-4">
+                    <div className="flex justify-end mb-4">
+                        <Button size="sm" onClick={() => handleOpenSyllabusItemModal(null)}>
+                            <PlusCircle className="mr-2 h-4 w-4" /> Add Syllabus Topic
+                        </Button>
+                    </div>
+                    <div className="border rounded-md max-h-[60vh] overflow-y-auto">
+                        <Table>
+                            <TableHeader><TableRow><TableHead>Title</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+                            <TableBody>
+                                {syllabusForCurrentSubject.map(item => (
+                                    <TableRow key={item.id}>
+                                        <TableCell>
+                                            <p className="font-medium">{item.title}</p>
+                                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.content}</p>
+                                        </TableCell>
+                                        <TableCell><Badge variant="secondary">{item.status}</Badge></TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="outline" size="sm" onClick={() => handleOpenSyllabusItemModal(item)} className="mr-2"><Edit className="h-4 w-4" /></Button>
+                                            <Button variant="ghost" size="icon" onClick={() => setDeleteTarget({ type: 'syllabusItem', id: item.id })}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        {syllabusForCurrentSubject.length === 0 && <p className="p-8 text-center text-muted-foreground">No syllabus topics added yet.</p>}
+                    </div>
+                </div>
+            </>}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add/Edit Syllabus Item Modal */}
+        <Dialog open={isSyllabusItemModalOpen} onOpenChange={setSyllabusItemModalOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{editingSyllabusItem ? 'Edit Syllabus Topic' : 'Add New Syllabus Topic'}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSyllabusItemSubmit} key={editingSyllabusItem?.id || 'new-syllabus-item'}>
+                    <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="title">Topic Title</Label>
+                            <Input id="title" name="title" required defaultValue={editingSyllabusItem?.title} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="content">Content / Description</Label>
+                            <Textarea id="content" name="content" required rows={4} defaultValue={editingSyllabusItem?.content} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select name="status" required defaultValue={editingSyllabusItem?.status || 'Pending'}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Pending">Pending</SelectItem>
+                                    <SelectItem value="In Progress">In Progress</SelectItem>
+                                    <SelectItem value="Completed">Completed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setSyllabusItemModalOpen(false)}>Cancel</Button>
+                        <Button type="submit">Save</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
 
 
       {/* Delete Confirmation Dialog */}
@@ -895,3 +1026,4 @@ export default function AdminPage() {
     </>
   );
 }
+

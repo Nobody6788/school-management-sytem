@@ -92,6 +92,11 @@ export const academic = {
     { id: 'SUB06', name: 'Calculus', className: 'Grade 11' },
     { id: 'SUB07', name: 'Gov & Econ', className: 'Grade 12' },
   ],
+  syllabus: [
+    { id: 'SYL01', subjectId: 'SUB01', title: 'Chapter 1: Algebra Basics', content: 'Introduction to variables, equations, and basic operations.', status: 'Completed' as const },
+    { id: 'SYL02', subjectId: 'SUB01', title: 'Chapter 2: Geometry Fundamentals', content: 'Points, lines, angles, and basic shapes.', status: 'In Progress' as const },
+    { id: 'SYL03', subjectId: 'SUB04', title: 'Unit 1: Kinematics', content: 'Study of motion, velocity, and acceleration.', status: 'Pending' as const },
+  ],
   grades: [
     { id: 'GR01', gradeName: 'A+', gradePoint: '5.0', percentageFrom: 80, percentageTo: 100 },
     { id: 'GR02', gradeName: 'A', gradePoint: '4.0', percentageFrom: 70, percentageTo: 79 },
