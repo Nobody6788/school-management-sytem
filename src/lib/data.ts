@@ -1,5 +1,6 @@
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -133,26 +134,37 @@ export const academic = {
   ],
 };
 
+export const questionBank = [
+  {
+    id: 'QB1',
+    subjectId: 'SUB04',
+    questionText: 'What is the unit of force?',
+    options: ['Joule', 'Watt', 'Newton', 'Pascal'],
+    correctAnswer: 'Newton'
+  },
+  {
+    id: 'QB2',
+    subjectId: 'SUB04',
+    questionText: 'What principle states that for every action, there is an equal and opposite reaction?',
+    options: ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Law of Conservation of Energy"],
+    correctAnswer: "Newton's Third Law"
+  },
+  {
+    id: 'QB3',
+    subjectId: 'SUB01',
+    questionText: 'What is the value of Pi to two decimal places?',
+    options: ['3.14', '3.15', '3.16', '3.13'],
+    correctAnswer: '3.14'
+  }
+];
+
 export const onlineExams = [
     {
         id: 'OE01',
         title: 'Physics Mid-Term Practice',
         classId: 'C02',
         subjectId: 'SUB04',
-        questions: [
-            {
-                id: 'Q1',
-                questionText: 'What is the unit of force?',
-                options: ['Joule', 'Watt', 'Newton', 'Pascal'],
-                correctAnswer: 'Newton'
-            },
-            {
-                id: 'Q2',
-                questionText: 'What is the formula for acceleration?',
-                options: ['v = u + at', 'F = ma', 'v^2 = u^2 + 2as', 's = ut + 1/2at^2'],
-                correctAnswer: 'F = ma'
-            }
-        ]
+        questionIds: ['QB1', 'QB2']
     }
 ];
 
