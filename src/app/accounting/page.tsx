@@ -589,7 +589,7 @@ export default function AccountingPage() {
       <Dialog open={isSlipModalOpen} onOpenChange={setSlipModalOpen}>
         <DialogContent className="max-w-md print:shadow-none print:border-none">
             <DialogHeader>
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start pr-10">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-16 w-16 border">
                             <AvatarImage src={`https://placehold.co/100x100.png`} data-ai-hint="school logo" />
