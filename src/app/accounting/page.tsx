@@ -308,6 +308,43 @@ export default function AccountingPage() {
           toast({ variant: 'destructive', title: 'Error', description: 'The reminder email could not be sent.' });
       }
   };
+  
+  const handleSendAllReminders = async () => {
+    const overdueInvoices = invoices.filter(i => i.status === 'Due' || i.status === 'Overdue');
+    if (overdueInvoices.length === 0) {
+        toast({ title: 'No Overdue Invoices', description: 'There are no pending invoices to send reminders for.' });
+        return;
+    }
+
+    toast({ title: 'Sending Reminders...', description: `Sending emails for ${overdueInvoices.length} overdue invoices.` });
+    
+    const reminderPromises = overdueInvoices.map(invoice => {
+        const student = getStudentDetails(invoice.studentId);
+        const parent = getParentForStudent(invoice.studentId);
+        if (!student || !parent?.email) {
+            return Promise.resolve({ success: false, invoiceId: invoice.id });
+        }
+        
+        const total = getInvoiceTotal(invoice.items).toFixed(2);
+        const subject = `Fee Reminder for ${student.name}`;
+        const body = `Dear ${parent.name},\n\nThis is a friendly reminder that an invoice for your child, ${student.name}, is due. The total amount is $${total}.\n\nInvoice ID: ${invoice.id}\nDue Date: ${format(new Date(invoice.date), 'MMMM dd, yyyy')}\n\nPlease log in to the portal to view and pay the invoice. Thank you.\n\nSincerely,\nCampusFlow Administration`;
+
+        return sendEmail({ to: parent.email, subject, body })
+            .then(() => ({ success: true, invoiceId: invoice.id }))
+            .catch(err => {
+                console.error(`Failed to send reminder for invoice ${invoice.id}`, err);
+                return ({ success: false, invoiceId: invoice.id });
+            });
+    });
+
+    const results = await Promise.all(reminderPromises);
+    const successfulCount = results.filter(r => r.success).length;
+
+    toast({
+        title: 'Reminders Sent!',
+        description: `${successfulCount} out of ${overdueInvoices.length} reminders were sent successfully.`
+    });
+  };
 
   return (
     <>
@@ -330,9 +367,14 @@ export default function AccountingPage() {
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <CardTitle>Student Invoices</CardTitle>
-                    <Button size="sm" onClick={() => handleOpenInvoiceModal(null)}>
-                      <PlusCircle className="mr-2 h-4 w-4" /> Add Invoice
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={handleSendAllReminders}>
+                           <BellRing className="mr-2 h-4 w-4" /> Send All Reminders
+                        </Button>
+                        <Button size="sm" onClick={() => handleOpenInvoiceModal(null)}>
+                          <PlusCircle className="mr-2 h-4 w-4" /> Add Invoice
+                        </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
