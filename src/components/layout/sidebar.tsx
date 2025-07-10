@@ -130,6 +130,7 @@ const adminMenu = {
             icon: BarChart3,
             children: [
                 { href: '/reports/hr', label: 'HR Reports', icon: BarChart3 },
+                { href: '/reports/financial', label: 'Financial Reports', icon: BarChart3 },
             ]
         },
         { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },

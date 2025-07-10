@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import {
   ChartConfig,
   ChartContainer,
@@ -110,7 +110,7 @@ export default function HrReportsPage() {
         const period = `${payroll.month} ${payroll.year}`;
         if (!acc[period]) {
             acc[period] = {
-                name: `${payroll.month.substring(0,3)} ${payroll.year}`,
+                name: `${payroll.month.substring(0,3)} ${String(payroll.year).slice(-2)}`,
                 total: 0,
             };
         }
@@ -118,7 +118,7 @@ export default function HrReportsPage() {
         return acc;
     }, {} as Record<string, { name: string; total: number }>);
 
-    return Object.values(summary).map(item => ({ ...item, payroll: item.total })).sort((a,b) => new Date(a.name) < new Date(b.name) ? 1 : -1);
+    return Object.values(summary).map(item => ({ ...item, payroll: item.total })).reverse();
   };
   
 
@@ -227,13 +227,15 @@ export default function HrReportsPage() {
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                        <BarChart accessibilityLayer data={getPayrollSummary()} margin={{ top: 20 }}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
-                            <YAxis tickLine={false} axisLine={false} tickMargin={10} tickFormatter={(value) => `$${value/1000}k`} />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                            <Bar dataKey="payroll" fill="var(--color-payroll)" radius={4} />
-                        </BarChart>
+                        <ResponsiveContainer>
+                            <BarChart data={getPayrollSummary()} margin={{ top: 20 }}>
+                                <CartesianGrid vertical={false} />
+                                <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
+                                <YAxis tickLine={false} axisLine={false} tickMargin={10} tickFormatter={(value) => `$${value/1000}k`} />
+                                <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                                <Bar dataKey="payroll" fill="var(--color-payroll)" radius={4} />
+                            </BarChart>
+                        </ResponsiveContainer>
                     </ChartContainer>
                 </CardContent>
              </Card>
