@@ -54,7 +54,8 @@ import {
   Clipboard,
   ChevronsUp,
   Laptop,
-  Briefcase
+  Briefcase,
+  BarChart3,
 } from 'lucide-react';
 
 
@@ -116,12 +117,6 @@ const adminMenu = {
         { href: '/staff-leave', label: 'Staff Leave', icon: Briefcase },
         { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
         { href: '/results', label: 'Manage Results', icon: BookCheck },
-        { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
-        { href: '/messaging', label: 'Messaging', icon: MessageSquare },
-        { href: '/library', label: 'Library', icon: Library },
-        { href: '/transport', label: 'Transport', icon: Bus },
-        { href: '/dormitories', label: 'Dormitories', icon: BedDouble },
-        { href: '/calendar', label: 'Events Calendar', icon: CalendarPlus },
         {
             label: "Finance",
             icon: DollarSign,
@@ -130,6 +125,19 @@ const adminMenu = {
                  { href: '/payroll', label: 'Payroll', icon: DollarSign },
             ]
         },
+        {
+            label: "Reports",
+            icon: BarChart3,
+            children: [
+                { href: '/reports/hr', label: 'HR Reports', icon: BarChart3 },
+            ]
+        },
+        { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
+        { href: '/messaging', label: 'Messaging', icon: MessageSquare },
+        { href: '/library', label: 'Library', icon: Library },
+        { href: '/transport', label: 'Transport', icon: Bus },
+        { href: '/dormitories', label: 'Dormitories', icon: BedDouble },
+        { href: '/calendar', label: 'Events Calendar', icon: CalendarPlus },
         {
             label: "General Settings",
             icon: Settings,
