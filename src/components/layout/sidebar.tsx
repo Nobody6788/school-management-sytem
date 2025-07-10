@@ -101,11 +101,12 @@ const adminMenu = {
     title: "Admin",
     icon: Shield,
     links: [
+        { href: '/', label: 'Dashboard', icon: LayoutDashboard },
         {
           label: "Academic Setup",
           icon: School,
           children: [
-            { href: '/admin', label: 'General', icon: Settings },
+            { href: '/admin/setup', label: 'General', icon: Settings },
             { href: '/admin/online-exams', label: 'Online Exams', icon: Laptop },
           ]
         },
@@ -288,16 +289,6 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-            <SidebarMenuItem>
-                <Link href="/">
-                    <SidebarMenuButton
-                    isActive={pathname === '/'}
-                    icon={<LayoutDashboard />}
-                    >
-                    Dashboard
-                    </SidebarMenuButton>
-                </Link>
-            </SidebarMenuItem>
             {menuGroups.map((group) => (
                 <SidebarMenuItem key={group.title}>
                     <CollapsibleSidebarMenu menu={group} pathname={pathname} />
