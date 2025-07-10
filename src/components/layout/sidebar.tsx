@@ -77,7 +77,7 @@ const NestedCollapsibleMenu = ({ item, pathname }: { item: any; pathname: string
         <SidebarMenu className="pl-4 pt-1">
           {item.children.map((link: any) => (
             <SidebarMenuItem key={link.href}>
-              <Link href={link.href} legacyBehavior passHref>
+              <Link href={link.href}>
                 <SidebarMenuButton
                   isActive={pathname === link.href}
                   icon={<link.icon />}
@@ -239,7 +239,7 @@ const CollapsibleSidebarMenu = ({
               {link.children ? (
                  <NestedCollapsibleMenu item={link} pathname={pathname} />
               ) : (
-                <Link href={link.href!} legacyBehavior passHref>
+                <Link href={link.href!}>
                   <SidebarMenuButton
                     isActive={pathname === link.href}
                     icon={<link.icon />}
@@ -271,7 +271,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
             <SidebarMenuItem>
-                <Link href="/" legacyBehavior passHref>
+                <Link href="/">
                     <SidebarMenuButton
                     isActive={pathname === '/'}
                     icon={<LayoutDashboard />}
@@ -290,7 +290,7 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
            <SidebarMenuItem>
-              <Link href="/login" legacyBehavior passHref>
+              <Link href="/login">
                 <SidebarMenuButton icon={<LogOut />}>
                   Logout
                 </SidebarMenuButton>
