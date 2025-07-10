@@ -57,6 +57,7 @@ import {
   Briefcase,
   BarChart3,
   FolderKanban,
+  FileEdit,
 } from 'lucide-react';
 
 
@@ -161,6 +162,7 @@ const teacherMenu = {
         { href: '/teacher-dashboard/calendar', label: 'My Calendar', icon: CalendarPlus },
         { href: '/teacher-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
         { href: '/teacher-dashboard/leave', label: 'My Leave', icon: Briefcase },
+        { href: '/teacher-dashboard/lesson-plan', label: 'Lesson Plan', icon: FileEdit },
         { href: '/teacher-dashboard/course-materials', label: 'Course Materials', icon: FolderKanban },
         { href: '/teacher-dashboard/classes', label: 'My Classes', icon: BookCopy },
         { href: '/teacher-dashboard/students', label: 'My Students', icon: Users },

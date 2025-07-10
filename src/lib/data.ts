@@ -3,6 +3,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -471,4 +472,10 @@ export const courseMaterials = [
     { id: 'CM01', subjectId: 'SUB04', teacherId: 'T02', title: 'Chapter 1: Kinematics Notes', description: 'Notes covering the first chapter of Physics.', fileName: 'physics_ch1.pdf', fileSize: '1.2MB', uploadDate: '2024-09-05', fileUrl: '#' },
     { id: 'CM02', subjectId: 'SUB04', teacherId: 'T02', title: 'Practice Problems: Kinematics', description: 'A worksheet with practice problems.', fileName: 'kinematics_problems.pdf', fileSize: '450KB', uploadDate: '2024-09-10', fileUrl: '#' },
     { id: 'CM03', subjectId: 'SUB08', teacherId: 'T02', title: 'Lab Safety Guidelines', description: 'Important safety guidelines for the chemistry lab.', fileName: 'lab_safety.pdf', fileSize: '200KB', uploadDate: '2024-09-02', fileUrl: '#' },
+];
+
+export const lessonPlans = [
+    { id: 'LP01', teacherId: 'T02', name: 'Introduction to Newtonian Physics', subjectId: 'SUB04', date: '2024-09-10', method: 'Lecture & Demo', periods: 2, note: 'Focus on the three laws of motion.', status: 'Completed' as const, file: 'newtonian_intro.pdf' },
+    { id: 'LP02', teacherId: 'T02', name: 'Chemical Bonding', subjectId: 'SUB08', date: '2024-09-12', method: 'Group Activity', periods: 1, note: 'Students will build models of molecules.', status: 'Completed' as const, file: null },
+    { id: 'LP03', teacherId: 'T02', name: 'Lab: Titration Basics', subjectId: 'SUB08', date: '2024-10-25', method: 'Practical Lab', periods: 2, note: 'Ensure all safety measures are in place.', status: 'Pending' as const, file: 'titration_lab_sheet.pdf' },
 ];
