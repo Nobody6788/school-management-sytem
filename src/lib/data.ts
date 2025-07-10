@@ -2,6 +2,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -94,6 +95,7 @@ export const academic = {
     { id: 'SUB05', name: 'World History', className: 'Grade 10' },
     { id: 'SUB06', name: 'Calculus', className: 'Grade 11' },
     { id: 'SUB07', name: 'Gov & Econ', className: 'Grade 12' },
+    { id: 'SUB08', name: 'Chemistry', className: 'Grade 10' },
   ],
   syllabus: [
     { id: 'SYL01', subjectId: 'SUB01', title: 'Chapter 1: Algebra Basics', content: 'Introduction to variables, equations, and basic operations.', status: 'Completed' as const },
@@ -463,4 +465,10 @@ export const leaveRequests = [
     { id: 'LR01', teacherId: 'T01', startDate: '2024-11-10', endDate: '2024-11-12', reason: 'Personal reasons.', status: 'Approved' as const },
     { id: 'LR02', teacherId: 'T04', startDate: '2024-11-15', endDate: '2024-11-15', reason: 'Medical appointment.', status: 'Pending' as const },
     { id: 'LR03', teacherId: 'T05', startDate: '2024-10-20', endDate: '2024-10-21', reason: 'Family emergency.', status: 'Rejected' as const },
+];
+
+export const courseMaterials = [
+    { id: 'CM01', subjectId: 'SUB04', teacherId: 'T02', title: 'Chapter 1: Kinematics Notes', description: 'Notes covering the first chapter of Physics.', fileName: 'physics_ch1.pdf', fileSize: '1.2MB', uploadDate: '2024-09-05', fileUrl: '#' },
+    { id: 'CM02', subjectId: 'SUB04', teacherId: 'T02', title: 'Practice Problems: Kinematics', description: 'A worksheet with practice problems.', fileName: 'kinematics_problems.pdf', fileSize: '450KB', uploadDate: '2024-09-10', fileUrl: '#' },
+    { id: 'CM03', subjectId: 'SUB08', teacherId: 'T02', title: 'Lab Safety Guidelines', description: 'Important safety guidelines for the chemistry lab.', fileName: 'lab_safety.pdf', fileSize: '200KB', uploadDate: '2024-09-02', fileUrl: '#' },
 ];

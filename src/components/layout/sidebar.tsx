@@ -56,6 +56,7 @@ import {
   Laptop,
   Briefcase,
   BarChart3,
+  FolderKanban,
 } from 'lucide-react';
 
 
@@ -160,6 +161,7 @@ const teacherMenu = {
         { href: '/teacher-dashboard/calendar', label: 'My Calendar', icon: CalendarPlus },
         { href: '/teacher-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
         { href: '/teacher-dashboard/leave', label: 'My Leave', icon: Briefcase },
+        { href: '/teacher-dashboard/course-materials', label: 'Course Materials', icon: FolderKanban },
         { href: '/teacher-dashboard/classes', label: 'My Classes', icon: BookCopy },
         { href: '/teacher-dashboard/students', label: 'My Students', icon: Users },
         { href: '/teacher-dashboard/teachers', label: 'Colleagues', icon: UsersRound },
@@ -183,6 +185,7 @@ const studentMenu = {
         { href: '/student-dashboard/calendar', label: 'My Calendar', icon: CalendarPlus },
         { href: '/student-dashboard/schedule', label: 'My Schedule', icon: CalendarDays },
         { href: '/student-dashboard/my-class', label: 'My Class', icon: BookCopy },
+        { href: '/student-dashboard/course-materials', label: 'Course Materials', icon: FolderKanban },
         { href: '/student-dashboard/online-exams', label: 'Online Exams', icon: Laptop },
         { href: '/student-dashboard/exam-routine', label: 'Exam Routine', icon: ClipboardList },
         { href: '/student-dashboard/grades', label: 'Grades', icon: GraduationCap },
