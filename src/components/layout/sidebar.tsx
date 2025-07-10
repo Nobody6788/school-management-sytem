@@ -52,7 +52,8 @@ import {
   UsersRound,
   ChevronRight,
   Clipboard,
-  ChevronsUp
+  ChevronsUp,
+  Laptop
 } from 'lucide-react';
 
 
@@ -96,7 +97,14 @@ const adminMenu = {
     title: "Admin",
     icon: Shield,
     links: [
-        { href: '/admin', label: 'Academic Setup', icon: School },
+        {
+          label: "Academic Setup",
+          icon: School,
+          children: [
+            { href: '/admin', label: 'General', icon: Settings },
+            { href: '/admin/online-exams', label: 'Online Exams', icon: Laptop },
+          ]
+        },
         { href: '/students', label: 'Students', icon: Users },
         { href: '/teachers', label: 'Teachers', icon: BookUser },
         { href: '/parents', label: 'Parents', icon: Contact },
@@ -293,4 +301,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-

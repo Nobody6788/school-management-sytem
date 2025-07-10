@@ -1,6 +1,8 @@
+
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Card,
   CardContent,
@@ -321,12 +323,15 @@ export default function AdminPage() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="classes">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="classes">Classes</TabsTrigger>
               <TabsTrigger value="sections">Sections</TabsTrigger>
               <TabsTrigger value="groups">Groups</TabsTrigger>
               <TabsTrigger value="subjects">Subjects</TabsTrigger>
               <TabsTrigger value="exams">Exams</TabsTrigger>
+              <TabsTrigger value="online-exams" asChild>
+                <Link href="/admin/online-exams">Online Exams</Link>
+              </TabsTrigger>
             </TabsList>
 
             {/* Classes Tab */}

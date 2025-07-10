@@ -127,6 +127,29 @@ export const academic = {
   ],
 };
 
+export const onlineExams = [
+    {
+        id: 'OE01',
+        title: 'Physics Mid-Term Practice',
+        classId: 'C02',
+        subjectId: 'SUB04',
+        questions: [
+            {
+                id: 'Q1',
+                questionText: 'What is the unit of force?',
+                options: ['Joule', 'Watt', 'Newton', 'Pascal'],
+                correctAnswer: 'Newton'
+            },
+            {
+                id: 'Q2',
+                questionText: 'What is the formula for acceleration?',
+                options: ['v = u + at', 'F = ma', 'v^2 = u^2 + 2as', 's = ut + 1/2at^2'],
+                correctAnswer: 'F = ma'
+            }
+        ]
+    }
+];
+
 export const attendanceData = {
   dailyPercentage: 92.5,
   yearlyPercentage: 94.1,
