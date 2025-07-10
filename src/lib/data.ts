@@ -4,6 +4,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -478,4 +479,10 @@ export const lessonPlans = [
     { id: 'LP01', teacherId: 'T02', name: 'Introduction to Newtonian Physics', subjectId: 'SUB04', date: '2024-09-10', method: 'Lecture & Demo', periods: 2, note: 'Focus on the three laws of motion.', status: 'Completed' as const, file: 'newtonian_intro.pdf' },
     { id: 'LP02', teacherId: 'T02', name: 'Chemical Bonding', subjectId: 'SUB08', date: '2024-09-12', method: 'Group Activity', periods: 1, note: 'Students will build models of molecules.', status: 'Completed' as const, file: null },
     { id: 'LP03', teacherId: 'T02', name: 'Lab: Titration Basics', subjectId: 'SUB08', date: '2024-10-25', method: 'Practical Lab', periods: 2, note: 'Ensure all safety measures are in place.', status: 'Pending' as const, file: 'titration_lab_sheet.pdf' },
+];
+
+export const todoList = [
+    { id: 'TODO01', task: 'Review budget proposals', completed: false },
+    { id: 'TODO02', task: 'Finalize the agenda for the parent-teacher conference', completed: false },
+    { id: 'TODO03', task: 'Approve leave request for Mr. Brown', completed: true },
 ];
