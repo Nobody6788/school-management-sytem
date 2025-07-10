@@ -1,3 +1,4 @@
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -398,4 +399,8 @@ export const payrolls = [
   { id: 'PAY01', teacherId: 'T01', month: 'September', year: 2024, baseSalary: 50000, bonus: 0, deductions: 5000, netSalary: 45000, status: 'Paid' as const },
   { id: 'PAY02', teacherId: 'T02', month: 'September', year: 2024, baseSalary: 52000, bonus: 200, deductions: 5200, netSalary: 47000, status: 'Paid' as const },
   { id: 'PAY03', teacherId: 'T01', month: 'October', year: 2024, baseSalary: 50000, bonus: 0, deductions: 5000, netSalary: 45000, status: 'Pending' as const },
+];
+
+export const promotions = [
+  { id: 'PROM1', date: '2023-04-05', fromClass: 'Grade 8', fromSection: 'Section A', toClass: 'Grade 9', toSection: 'Section A', studentIds: ['S002'] }
 ];

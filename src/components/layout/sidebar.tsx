@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -51,6 +52,7 @@ import {
   UsersRound,
   ChevronRight,
   Clipboard,
+  ChevronsUp
 } from 'lucide-react';
 
 
@@ -99,6 +101,7 @@ const adminMenu = {
         { href: '/teachers', label: 'Teachers', icon: BookUser },
         { href: '/parents', label: 'Parents', icon: Contact },
         { href: '/schedule', label: 'Class Schedule', icon: CalendarDays },
+        { href: '/promote', label: 'Promote Students', icon: ChevronsUp },
         { href: '/attendance', label: 'Attendance', icon: UserCheck },
         { href: '/staff-attendance', label: 'Staff Attendance', icon: Clipboard },
         { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
@@ -290,3 +293,4 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
