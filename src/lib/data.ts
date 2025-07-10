@@ -2,6 +2,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -202,7 +203,12 @@ export const dormitories = {
   ]
 };
 
-export const accounting = {
+export const accounting: {
+  accountTypes: { id: string; name: string }[];
+  accountTitles: { id: string; name: string; typeId: string }[];
+  invoices: { id: string; studentId: string; date: string; status: 'Paid' | 'Due' | 'Overdue'; items: { id: string; accountTitleId: string; amount: number; description: string }[] }[];
+  expenses: { id: string; date: string; accountTitleId: string; amount: number; description: string }[];
+} = {
   accountTypes: [
     { id: 'AT01', name: 'Income' },
     { id: 'AT02', name: 'Expense' },
@@ -246,6 +252,25 @@ export const accounting = {
       status: 'Paid',
       items: [
         { id: 'ITEM004', accountTitleId: 'ATL01', amount: 1000, description: 'Admission Fee' }
+      ]
+    },
+     { 
+      id: 'INV004', 
+      studentId: 'S004', 
+      date: '2024-10-01', 
+      status: 'Due',
+      items: [
+        { id: 'ITEM005', accountTitleId: 'ATL02', amount: 600, description: 'Tuition Fee for October' }
+      ]
+    },
+     { 
+      id: 'INV005', 
+      studentId: 'S005', 
+      date: '2024-09-15', 
+      status: 'Overdue',
+      items: [
+        { id: 'ITEM006', accountTitleId: 'ATL02', amount: 550, description: 'Tuition Fee for September' },
+        { id: 'ITEM007', accountTitleId: 'ATL07', amount: 10, description: 'Late library book' }
       ]
     },
   ],

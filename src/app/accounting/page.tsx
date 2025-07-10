@@ -25,6 +25,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -56,9 +57,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MoreHorizontal, PlusCircle, Printer, FileText, Trash2 } from 'lucide-react';
-import { accounting, students } from '@/lib/data';
+import { MoreHorizontal, PlusCircle, Printer, FileText, Trash2, BellRing, CheckCircle } from 'lucide-react';
+import { accounting, students, parents } from '@/lib/data';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { sendEmail } from '@/ai/flows/send-email-flow';
+import { Badge } from '@/components/ui/badge';
+
 
 type AccountType = (typeof accounting.accountTypes)[0];
 type AccountTitle = (typeof accounting.accountTitles)[0];
@@ -73,7 +78,7 @@ type Invoice = {
   id: string;
   studentId: string;
   date: string;
-  status: string;
+  status: 'Paid' | 'Due' | 'Overdue';
   items: InvoiceItem[];
 };
 
@@ -83,6 +88,7 @@ export default function AccountingPage() {
   const [accountTitles, setAccountTitles] = useState(accounting.accountTitles);
   const [invoices, setInvoices] = useState(accounting.invoices);
   const [expenses, setExpenses] = useState(accounting.expenses);
+  const { toast } = useToast();
 
   const [isTypeModalOpen, setTypeModalOpen] = useState(false);
   const [isTitleModalOpen, setTitleModalOpen] = useState(false);
@@ -103,8 +109,9 @@ export default function AccountingPage() {
   const [deleteTarget, setDeleteTarget] = useState<{ type: 'type' | 'title' | 'invoice' | 'expense'; id: string } | null>(null);
 
   const getTypeName = (typeId: string) => accountTypes.find(t => t.id === typeId)?.name || 'N/A';
-  const getStudentName = (studentId: string) => students.find(s => s.id === studentId)?.name || 'N/A';
   const getStudentDetails = (studentId: string) => students.find(s => s.id === studentId);
+  const getStudentName = (studentId: string) => getStudentDetails(studentId)?.name || 'N/A';
+  const getParentForStudent = (studentId: string) => parents.find(p => p.studentId === studentId);
   const getAccountTitleName = (titleId: string) => accountTitles.find(t => t.id === titleId)?.name || 'N/A';
   const getInvoiceTotal = (items: InvoiceItem[]) => items.reduce((total, item) => total + (item.amount || 0), 0);
 
@@ -187,7 +194,7 @@ export default function AccountingPage() {
   const handleInvoiceSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!invoiceStudentId || invoiceItems.some(item => !item.accountTitleId || item.amount <= 0)) {
-        alert('Please fill out all required fields for the invoice.');
+        toast({ variant: 'destructive', title: 'Error', description: 'Please fill out all required fields for the invoice.'});
         return;
     }
 
@@ -204,7 +211,7 @@ export default function AccountingPage() {
             studentId: invoiceStudentId,
             items: invoiceItems.map((item, index) => ({ ...item, id: `ITEM${Date.now()}${index}` })),
             date: format(new Date(), 'yyyy-MM-dd'),
-            status: 'Paid',
+            status: 'Due',
         };
         setInvoices([newInvoice, ...invoices]);
     }
@@ -276,6 +283,32 @@ export default function AccountingPage() {
     window.print();
   };
 
+  const handleMarkAsPaid = (invoiceId: string) => {
+      setInvoices(invoices.map(i => i.id === invoiceId ? { ...i, status: 'Paid' } : i));
+      toast({ title: 'Invoice Updated', description: 'The invoice has been marked as paid.' });
+  }
+
+  const handleSendReminder = async (invoice: Invoice) => {
+      const student = getStudentDetails(invoice.studentId);
+      const parent = getParentForStudent(invoice.studentId);
+      if (!student || !parent?.email) {
+          toast({ variant: 'destructive', title: 'Error', description: 'Could not find parent email for this student.' });
+          return;
+      }
+      
+      const total = getInvoiceTotal(invoice.items).toFixed(2);
+      const subject = `Fee Reminder for ${student.name}`;
+      const body = `Dear ${parent.name},\n\nThis is a friendly reminder that an invoice for your child, ${student.name}, is due. The total amount is $${total}.\n\nInvoice ID: ${invoice.id}\nDue Date: ${format(new Date(invoice.date), 'MMMM dd, yyyy')}\n\nPlease log in to the portal to view and pay the invoice. Thank you.\n\nSincerely,\nCampusFlow Administration`;
+
+      try {
+          await sendEmail({ to: parent.email, subject, body });
+          toast({ title: 'Reminder Sent!', description: `A fee reminder email has been sent to ${parent.name}.` });
+      } catch (error) {
+          console.error("Reminder email failed to send", error);
+          toast({ variant: 'destructive', title: 'Error', description: 'The reminder email could not be sent.' });
+      }
+  };
+
   return (
     <>
       <Card>
@@ -309,6 +342,7 @@ export default function AccountingPage() {
                         <TableHead>Student</TableHead>
                         <TableHead>Payment For</TableHead>
                         <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead className="text-right">Amount</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
@@ -318,7 +352,13 @@ export default function AccountingPage() {
                         <TableRow key={invoice.id}>
                           <TableCell className="font-medium">{getStudentName(invoice.studentId)}</TableCell>
                           <TableCell>{invoice.items.map(item => getAccountTitleName(item.accountTitleId)).join(', ')}</TableCell>
-                          <TableCell>{invoice.date}</TableCell>
+                          <TableCell>{format(new Date(invoice.date + 'T00:00:00'), 'yyyy-MM-dd')}</TableCell>
+                          <TableCell>
+                            <Badge variant={invoice.status === 'Paid' ? 'default' : 'outline'}
+                                   className={invoice.status === 'Paid' ? 'bg-green-600' : 'bg-red-500 text-white'}>
+                                {invoice.status}
+                            </Badge>
+                          </TableCell>
                           <TableCell className="text-right">${getInvoiceTotal(invoice.items).toFixed(2)}</TableCell>
                           <TableCell className="text-right">
                             <DropdownMenu>
@@ -327,7 +367,14 @@ export default function AccountingPage() {
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                 <DropdownMenuItem onClick={() => handleOpenSlipModal(invoice)}><FileText className="mr-2 h-4 w-4" /> View Slip</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleOpenInvoiceModal(invoice)}>Edit</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'invoice', id: invoice.id })}>Delete</DropdownMenuItem>
+                                {invoice.status !== 'Paid' && (
+                                    <>
+                                        <DropdownMenuItem onClick={() => handleMarkAsPaid(invoice.id)}><CheckCircle className="mr-2 h-4 w-4" /> Mark as Paid</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleSendReminder(invoice)}><BellRing className="mr-2 h-4 w-4" /> Send Reminder</DropdownMenuItem>
+                                    </>
+                                )}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteTarget({ type: 'invoice', id: invoice.id })}><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
@@ -572,7 +619,7 @@ export default function AccountingPage() {
                                     <div><strong>Section:</strong> {student.section}</div>
                                 </>
                             )}
-                            <div><strong>Date:</strong> {format(new Date(viewingInvoice.date), 'MMMM dd, yyyy')}</div>
+                            <div><strong>Date:</strong> {format(new Date(viewingInvoice.date + 'T00:00:00'), 'MMMM dd, yyyy')}</div>
                             <div><strong>Invoice ID:</strong> {viewingInvoice.id}</div>
                         </div>
                         <Table>
@@ -601,7 +648,7 @@ export default function AccountingPage() {
                             </TableFooter>
                         </Table>
                          <div className="text-center pt-8">
-                            <p className="font-bold text-green-600 text-2xl tracking-widest">PAID</p>
+                            <p className="font-bold text-green-600 text-2xl tracking-widest uppercase">{viewingInvoice.status}</p>
                         </div>
                     </div>
                 )
