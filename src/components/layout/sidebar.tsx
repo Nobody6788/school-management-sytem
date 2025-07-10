@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -111,11 +110,18 @@ const adminMenu = {
         { href: '/dormitories', label: 'Dormitories', icon: BedDouble },
         { href: '/calendar', label: 'Events Calendar', icon: CalendarPlus },
         {
+            label: "Finance",
+            icon: DollarSign,
+            children: [
+                 { href: '/accounting', label: 'Fees & Expenses', icon: DollarSign },
+                 { href: '/payroll', label: 'Payroll', icon: DollarSign },
+            ]
+        },
+        {
             label: "General Settings",
             icon: Settings,
             children: [
                 { href: '/settings', label: 'Institute Profile', icon: School },
-                { href: '/accounting', label: 'Fees Particulars', icon: DollarSign },
                 { href: '/grades', label: 'Marks Grading', icon: GraduationCap },
                 { href: '/profile', label: 'Account Settings', icon: User },
             ]

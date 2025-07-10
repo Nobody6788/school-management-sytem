@@ -354,8 +354,8 @@ export default function AccountingPage() {
                           <TableCell>{invoice.items.map(item => getAccountTitleName(item.accountTitleId)).join(', ')}</TableCell>
                           <TableCell>{format(new Date(invoice.date + 'T00:00:00'), 'yyyy-MM-dd')}</TableCell>
                           <TableCell>
-                            <Badge variant={invoice.status === 'Paid' ? 'default' : 'outline'}
-                                   className={invoice.status === 'Paid' ? 'bg-green-600' : 'bg-red-500 text-white'}>
+                            <Badge variant={invoice.status === 'Paid' ? 'default' : 'destructive'}
+                                   className={invoice.status === 'Paid' ? 'bg-green-600' : ''}>
                                 {invoice.status}
                             </Badge>
                           </TableCell>

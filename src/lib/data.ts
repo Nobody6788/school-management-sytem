@@ -1,8 +1,3 @@
-
-
-
-
-
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -25,11 +20,11 @@ export const students = [
 ];
 
 export const teachers = [
-    { id: 'T01', name: 'Mr. Benjamin Carter', specialization: 'Mathematics', email: 'ben.carter@example.com', phone: '555-1111', address: '123 Math Lane', profilePicture: 'https://placehold.co/100x100.png' },
-    { id: 'T02', name: 'Ms. Ava Davis', specialization: 'Physics, Chemistry', email: 'ava.davis@example.com', phone: '555-2222', address: '456 Physics Ave', profilePicture: 'https://placehold.co/100x100.png' },
-    { id: 'T03', name: 'Dr. Emily White', specialization: 'Chemistry', email: 'emily.white@example.com', phone: '555-3333', address: '789 Chemistry Blvd', profilePicture: 'https://placehold.co/100x100.png' },
-    { id: 'T04', name: 'Mr. Lucas Brown', specialization: 'History', email: 'lucas.brown@example.com', phone: '555-4444', address: '101 History Ct', profilePicture: 'https://placehold.co/100x100.png' },
-    { id: 'T05', name: 'Ms. Chloe Garcia', specialization: 'English Literature', email: 'chloe.garcia@example.com', phone: '555-5555', address: '212 Literature Rd', profilePicture: 'https://placehold.co/100x100.png' },
+    { id: 'T01', name: 'Mr. Benjamin Carter', specialization: 'Mathematics', email: 'ben.carter@example.com', phone: '555-1111', address: '123 Math Lane', profilePicture: 'https://placehold.co/100x100.png', salary: 50000 },
+    { id: 'T02', name: 'Ms. Ava Davis', specialization: 'Physics, Chemistry', email: 'ava.davis@example.com', phone: '555-2222', address: '456 Physics Ave', profilePicture: 'https://placehold.co/100x100.png', salary: 52000 },
+    { id: 'T03', name: 'Dr. Emily White', specialization: 'Chemistry', email: 'emily.white@example.com', phone: '555-3333', address: '789 Chemistry Blvd', profilePicture: 'https://placehold.co/100x100.png', salary: 55000 },
+    { id: 'T04', name: 'Mr. Lucas Brown', specialization: 'History', email: 'lucas.brown@example.com', phone: '555-4444', address: '101 History Ct', profilePicture: 'https://placehold.co/100x100.png', salary: 48000 },
+    { id: 'T05', name: 'Ms. Chloe Garcia', specialization: 'English Literature', email: 'chloe.garcia@example.com', phone: '555-5555', address: '212 Literature Rd', profilePicture: 'https://placehold.co/100x100.png', salary: 49000 },
 ];
 
 export const parents = [
@@ -397,4 +392,10 @@ export const studentPersonalEvents = [
 export const parentPersonalEvents = [
   { id: 'PE01', date: '2024-11-20', title: 'Attend Parent-Teacher Conference', description: 'Meeting with Grade 10 teachers.' },
   { id: 'PE02', date: '2024-12-10', title: 'Volunteer for Bake Sale', description: 'Help out at the annual school fundraiser.' },
+];
+
+export const payrolls = [
+  { id: 'PAY01', teacherId: 'T01', month: 'September', year: 2024, baseSalary: 50000, bonus: 0, deductions: 5000, netSalary: 45000, status: 'Paid' as const },
+  { id: 'PAY02', teacherId: 'T02', month: 'September', year: 2024, baseSalary: 52000, bonus: 200, deductions: 5200, netSalary: 47000, status: 'Paid' as const },
+  { id: 'PAY03', teacherId: 'T01', month: 'October', year: 2024, baseSalary: 50000, bonus: 0, deductions: 5000, netSalary: 45000, status: 'Pending' as const },
 ];
