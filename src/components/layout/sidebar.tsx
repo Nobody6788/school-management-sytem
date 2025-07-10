@@ -53,7 +53,8 @@ import {
   ChevronRight,
   Clipboard,
   ChevronsUp,
-  Laptop
+  Laptop,
+  Briefcase
 } from 'lucide-react';
 
 
@@ -112,6 +113,7 @@ const adminMenu = {
         { href: '/promote', label: 'Promote Students', icon: ChevronsUp },
         { href: '/attendance', label: 'Attendance', icon: UserCheck },
         { href: '/staff-attendance', label: 'Staff Attendance', icon: Clipboard },
+        { href: '/staff-leave', label: 'Staff Leave', icon: Briefcase },
         { href: '/exam-attendance', label: 'Exam Attendance', icon: ClipboardCheck },
         { href: '/results', label: 'Manage Results', icon: BookCheck },
         { href: '/noticeboard', label: 'Noticeboard', icon: Megaphone },
@@ -148,6 +150,7 @@ const teacherMenu = {
         { href: '/teacher-dashboard/profile', label: 'My Profile', icon: User },
         { href: '/teacher-dashboard/calendar', label: 'My Calendar', icon: CalendarPlus },
         { href: '/teacher-dashboard/messaging', label: 'Messaging', icon: MessageSquare },
+        { href: '/teacher-dashboard/leave', label: 'My Leave', icon: Briefcase },
         { href: '/teacher-dashboard/classes', label: 'My Classes', icon: BookCopy },
         { href: '/teacher-dashboard/students', label: 'My Students', icon: Users },
         { href: '/teacher-dashboard/teachers', label: 'Colleagues', icon: UsersRound },

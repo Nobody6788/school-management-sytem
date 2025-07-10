@@ -1,4 +1,5 @@
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -431,4 +432,10 @@ export const payrolls = [
 
 export const promotions = [
   { id: 'PROM1', date: '2023-04-05', fromClass: 'Grade 8', fromSection: 'Section A', toClass: 'Grade 9', toSection: 'Section A', studentIds: ['S002'] }
+];
+
+export const leaveRequests = [
+    { id: 'LR01', teacherId: 'T01', startDate: '2024-11-10', endDate: '2024-11-12', reason: 'Personal reasons.', status: 'Approved' as const },
+    { id: 'LR02', teacherId: 'T04', startDate: '2024-11-15', endDate: '2024-11-15', reason: 'Medical appointment.', status: 'Pending' as const },
+    { id: 'LR03', teacherId: 'T05', startDate: '2024-10-20', endDate: '2024-10-21', reason: 'Family emergency.', status: 'Rejected' as const },
 ];
