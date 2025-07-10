@@ -186,7 +186,9 @@ export default function OnlineExamsPage() {
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" className="mr-2" onClick={() => handleOpenQuestionManager(exam)}>Manage Questions</Button>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild><Button size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button>
+                      </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleOpenExamModal(exam)}>Edit Details</DropdownMenuItem>
@@ -203,7 +205,10 @@ export default function OnlineExamsPage() {
       
       {/* Add/Edit Exam Modal */}
       <Dialog open={isExamModalOpen} onOpenChange={setExamModalOpen}>
-        <DialogContent><DialogHeader><DialogTitle>{editingExam ? 'Edit Exam Details' : 'Add New Exam'}</DialogTitle></DialogHeader>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingExam ? 'Edit Exam Details' : 'Add New Exam'}</DialogTitle>
+          </DialogHeader>
           <form onSubmit={handleExamSubmit} key={editingExam?.id || 'new-exam'}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="title" className="text-right">Title</Label><Input id="title" name="title" className="col-span-3" required defaultValue={editingExam?.title} /></div>
@@ -260,8 +265,11 @@ export default function OnlineExamsPage() {
 
       {/* Add/Edit Question Modal */}
       <Dialog open={isQuestionModalOpen} onOpenChange={setQuestionModalOpen}>
-        <DialogContent><DialogHeader><DialogTitle>{editingQuestion ? 'Edit Question' : 'Add New Question'}</DialogTitle></DialogHeader>
-        <form onSubmit={handleQuestionSubmit} key={editingQuestion?.id || 'new-question'}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingQuestion ? 'Edit Question' : 'Add New Question'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleQuestionSubmit} key={editingQuestion?.id || 'new-question'}>
             <div className="grid gap-4 py-4">
                 <div className="space-y-2">
                     <Label htmlFor="questionText">Question Text</Label>
@@ -279,7 +287,8 @@ export default function OnlineExamsPage() {
                 </div>
             </div>
             <DialogFooter><Button type="button" variant="outline" onClick={() => setQuestionModalOpen(false)}>Cancel</Button><Button type="submit">Save Question</Button></DialogFooter>
-        </form>
+          </form>
+        </DialogContent>
       </Dialog>
       
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
