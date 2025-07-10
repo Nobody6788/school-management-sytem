@@ -1,6 +1,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -166,6 +167,18 @@ export const onlineExams = [
         subjectId: 'SUB04',
         questionIds: ['QB1', 'QB2']
     }
+];
+
+export const examSubmissions = [
+  { 
+    submissionId: 'SUBM01', 
+    studentId: 'S001', 
+    examId: 'OE01', 
+    answers: { 'QB1': 'Newton', 'QB2': "Newton's Second Law" }, 
+    score: 1, 
+    totalQuestions: 2,
+    submittedAt: '2024-10-23T10:00:00Z' 
+  }
 ];
 
 export const attendanceData = {

@@ -183,6 +183,7 @@ const studentMenu = {
         { href: '/student-dashboard/calendar', label: 'My Calendar', icon: CalendarPlus },
         { href: '/student-dashboard/schedule', label: 'My Schedule', icon: CalendarDays },
         { href: '/student-dashboard/my-class', label: 'My Class', icon: BookCopy },
+        { href: '/student-dashboard/online-exams', label: 'Online Exams', icon: Laptop },
         { href: '/student-dashboard/exam-routine', label: 'Exam Routine', icon: ClipboardList },
         { href: '/student-dashboard/grades', label: 'Grades', icon: GraduationCap },
         { href: '/student-dashboard/results', label: 'My Results', icon: BookCheck },
