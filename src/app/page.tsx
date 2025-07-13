@@ -30,7 +30,6 @@ const incomeData = [
   { name: 'Jul', income: 3490, expenses: 4300 },
 ];
 
-const eventDates = academicEvents.map(event => new Date(event.date + 'T00:00:00'));
 const eventDatesByType = {
     holiday: academicEvents.filter(e => e.type === 'Holiday').map(e => new Date(e.date + 'T00:00:00')),
     exam: academicEvents.filter(e => e.type === 'Exam').map(e => new Date(e.date + 'T00:00:00')),
@@ -212,34 +211,24 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 gap-6">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="flex items-baseline gap-2">
-                <CardTitle className="text-xl font-medium">Academic Calendar</CardTitle>
-                 <Link href="/calendar">
-                  <Button variant="link" className="p-0 h-auto text-sm">View Full Calendar</Button>
-                </Link>
-            </div>
-          </CardHeader>
-          <CardContent className="p-2">
-             <Calendar
-                mode="single"
-                selected={date}
-                onSelect={handleDateSelect}
-                month={month}
-                onMonthChange={setMonth}
-                modifiers={{ 
-                    holiday: eventDatesByType.holiday,
-                    exam: eventDatesByType.exam,
-                    event: eventDatesByType.event,
-                 }}
-                modifiersClassNames={{
-                    holiday: 'day-holiday',
-                    exam: 'day-exam',
-                    event: 'day-event',
-                }}
-                className="w-full"
-              />
-          </CardContent>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={handleDateSelect}
+            month={month}
+            onMonthChange={setMonth}
+            modifiers={{ 
+                holiday: eventDatesByType.holiday,
+                exam: eventDatesByType.exam,
+                event: eventDatesByType.event,
+              }}
+            modifiersClassNames={{
+                holiday: 'day-holiday',
+                exam: 'day-exam',
+                event: 'day-event',
+            }}
+            className="w-full"
+          />
           <CardFooter className="flex-col items-start gap-2 border-t pt-4">
               <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-red-500 fill-current" /> <span>Holiday</span></div>
@@ -283,3 +272,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

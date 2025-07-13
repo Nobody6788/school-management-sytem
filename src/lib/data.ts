@@ -6,6 +6,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -491,7 +492,6 @@ export const todoList = [
     { id: 'TODO03', task: 'Approve leave request for Mr. Brown', completed: true },
 ];
 
-// This is being deprecated in favor of academicEvents
 export const personalEvents = [
   { id: 'E01', date: '2024-10-25', title: 'Review Q3 Budget', description: 'Finalize the budget report for the third quarter.' },
   { id: 'E02', date: '2024-11-05', title: 'Meeting with School Board', description: 'Discuss the new curriculum proposal.' },
