@@ -5,6 +5,7 @@
 
 
 
+
 export const stats = {
   activeStudents: 1250,
   totalTeachers: 75,
@@ -374,10 +375,13 @@ export const settings = {
   timezone: 'America/New_York',
 };
 
-export const personalEvents = [
-  { id: 'E01', date: '2024-10-25', title: 'Review Q3 Budget', description: 'Finalize the budget report for the third quarter.' },
-  { id: 'E02', date: '2024-11-05', title: 'Meeting with School Board', description: 'Discuss the new curriculum proposal.' },
-  { id: 'E03', date: '2024-11-05', title: 'Prepare for Science Fair', description: 'Coordinate with science teachers for the upcoming fair.' },
+export const academicEvents: { id: string; date: string; title: string; description: string; type: 'Holiday' | 'Exam' | 'Event' }[] = [
+    { id: 'E01', date: '2024-10-31', title: 'Halloween Party', description: 'School-wide costume party in the auditorium.', type: 'Event' },
+    { id: 'E02', date: '2024-11-28', title: 'Thanksgiving Break', description: 'School closed for Thanksgiving.', type: 'Holiday' },
+    { id: 'E03', date: '2024-11-29', title: 'Thanksgiving Break', description: 'School closed for Thanksgiving.', type: 'Holiday' },
+    { id: 'ER01', date: '2024-12-01', title: 'Mid-Term: Grade 9 Math', description: 'Mid-Term Exam for Grade 9 Mathematics in Room 201.', type: 'Exam' },
+    { id: 'ER03', date: '2024-12-01', title: 'Mid-Term: Grade 10 Physics', description: 'Mid-Term Exam for Grade 10 Physics in Room 202.', type: 'Exam' },
+    { id: 'ER02', date: '2024-12-02', title: 'Mid-Term: Grade 9 Science', description: 'Mid-Term Exam for Grade 9 Science in Room 201.', type: 'Exam' },
 ];
 
 export const messages = [
@@ -485,4 +489,11 @@ export const todoList = [
     { id: 'TODO01', task: 'Review budget proposals', completed: false },
     { id: 'TODO02', task: 'Finalize the agenda for the parent-teacher conference', completed: false },
     { id: 'TODO03', task: 'Approve leave request for Mr. Brown', completed: true },
+];
+
+// This is being deprecated in favor of academicEvents
+export const personalEvents = [
+  { id: 'E01', date: '2024-10-25', title: 'Review Q3 Budget', description: 'Finalize the budget report for the third quarter.' },
+  { id: 'E02', date: '2024-11-05', title: 'Meeting with School Board', description: 'Discuss the new curriculum proposal.' },
+  { id: 'E03', date: '2024-11-05', title: 'Prepare for Science Fair', description: 'Coordinate with science teachers for the upcoming fair.' },
 ];

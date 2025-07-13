@@ -11,15 +11,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { personalEvents as initialEvents } from '@/lib/data';
+import { academicEvents as initialEvents } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 
-type PersonalEvent = {
-  id: string;
-  date: Date;
-  title: string;
-  description: string;
-};
+type PersonalEvent = (typeof initialEvents)[0];
 
 // Convert string dates from data file to Date objects
 const parsedEvents = initialEvents.map(event => ({
@@ -28,7 +23,7 @@ const parsedEvents = initialEvents.map(event => ({
 }));
 
 export default function PersonalCalendarPage() {
-  const [events, setEvents] = useState<PersonalEvent[]>(parsedEvents);
+  const [events, setEvents] = useState(parsedEvents);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<PersonalEvent | null>(null);
@@ -69,6 +64,7 @@ export default function PersonalCalendarPage() {
         date: selectedDate,
         title,
         description,
+        type: 'Event',
       };
       setEvents([...events, newEvent]);
       toast({ title: "Event Created", description: "Your new event has been added to the calendar." });
@@ -83,6 +79,12 @@ export default function PersonalCalendarPage() {
     toast({ title: "Event Deleted", description: "The event has been removed from your calendar." });
   };
 
+  const eventDatesByType = {
+    holiday: events.filter(e => e.type === 'Holiday').map(e => new Date(e.date)),
+    exam: events.filter(e => e.type === 'Exam').map(e => new Date(e.date)),
+    event: events.filter(e => e.type === 'Event').map(e => new Date(e.date)),
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <Card className="lg:col-span-1">
@@ -95,16 +97,15 @@ export default function PersonalCalendarPage() {
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
-            className="rounded-md border"
             modifiers={{
-              hasEvent: events.map(e => e.date),
+              holiday: eventDatesByType.holiday,
+              exam: eventDatesByType.exam,
+              event: eventDatesByType.event,
             }}
-            modifiersStyles={{
-              hasEvent: {
-                fontWeight: 'bold',
-                textDecoration: 'underline',
-                textDecorationColor: 'hsl(var(--primary))'
-              },
+            modifiersClassNames={{
+              holiday: 'day-holiday',
+              exam: 'day-exam',
+              event: 'day-event',
             }}
           />
         </CardContent>

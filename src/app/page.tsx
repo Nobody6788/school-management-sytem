@@ -10,14 +10,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TodoItem } from '@/components/todo-item';
-import { Users, BookUser, Contact, Briefcase, PlusCircle, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { Users, BookUser, Contact, Briefcase, PlusCircle, ChevronLeft, ChevronRight, CalendarDays, Circle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { notices, stats, students, teachers, parents, todoList as initialTodoList, personalEvents, schedule } from '@/lib/data';
+import { notices, stats, students, teachers, parents, todoList as initialTodoList, academicEvents } from '@/lib/data';
 import { Calendar } from '@/components/ui/calendar';
-import { format, isSameDay, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { format, isSameDay, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 type Todo = (typeof initialTodoList)[0];
-type CalendarView = 'month' | 'week' | 'day' | 'list';
+type AcademicEvent = (typeof academicEvents)[0];
 
 const incomeData = [
   { name: 'Jan', income: 4000, expenses: 2400 },
@@ -29,16 +30,18 @@ const incomeData = [
   { name: 'Jul', income: 3490, expenses: 4300 },
 ];
 
-const eventDates = personalEvents.map(event => new Date(event.date + 'T00:00:00'));
-
-const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const eventDates = academicEvents.map(event => new Date(event.date + 'T00:00:00'));
+const eventDatesByType = {
+    holiday: academicEvents.filter(e => e.type === 'Holiday').map(e => new Date(e.date + 'T00:00:00')),
+    exam: academicEvents.filter(e => e.type === 'Exam').map(e => new Date(e.date + 'T00:00:00')),
+    event: academicEvents.filter(e => e.type === 'Event').map(e => new Date(e.date + 'T00:00:00')),
+};
 
 export default function Dashboard() {
   const [todoList, setTodoList] = useState<Todo[]>(initialTodoList);
   const [newTodo, setNewTodo] = useState('');
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [month, setMonth] = useState(date || new Date());
-  const [calendarView, setCalendarView] = useState<CalendarView>('month');
   
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,130 +66,22 @@ export default function Dashboard() {
     setTodoList(prev => prev.filter(todo => todo.id !== id));
   };
   
-  const handleTodayClick = () => {
-    const today = new Date();
-    setDate(today);
-    setMonth(today);
-  }
-  
-  const renderCalendarContent = () => {
-    switch (calendarView) {
-      case 'month':
-        return (
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            month={month}
-            onMonthChange={setMonth}
-            modifiers={{ hasEvent: eventDates }}
-            components={{
-              IconLeft: () => <ChevronLeft className="h-4 w-4" />,
-              IconRight: () => <ChevronRight className="h-4 w-4" />,
-              DayContent: (props) => {
-                const hasEvent = eventDates.some(d => isSameDay(d, props.date));
-                return (
-                  <>
-                    {props.date.getDate()}
-                    {hasEvent && <div className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary" />}
-                  </>
-                )
-              }
-            }}
-          />
-        );
-      case 'day': {
-        const selectedDay = date ? weekdays[date.getDay() === 0 ? 6 : date.getDay() - 1] : '';
-        const daySchedule = Object.entries(schedule).flatMap(([grade, slots]) => 
-            slots.map(slot => ({
-                time: slot.time,
-                grade,
-                subject: slot[selectedDay as keyof typeof slot]
-            })).filter(item => typeof item.subject === 'string')
-        ).sort((a,b) => a.time.localeCompare(b.time));
-
-        return (
-             <div className="p-4 min-h-[300px]">
-                 <h3 className="font-semibold text-lg mb-4">Schedule for {date ? format(date, 'PPPP') : 'selected day'}</h3>
-                 {daySchedule.length > 0 ? (
-                     <Table>
-                         <TableHeader><TableRow><TableHead>Time</TableHead><TableHead>Grade</TableHead><TableHead>Subject</TableHead></TableRow></TableHeader>
-                         <TableBody>
-                             {daySchedule.map((item, index) => (
-                                 <TableRow key={index}><TableCell>{item.time}</TableCell><TableCell>{item.grade}</TableCell><TableCell>{item.subject}</TableCell></TableRow>
-                             ))}
-                         </TableBody>
-                     </Table>
-                 ) : <p className="text-center text-muted-foreground pt-16">No classes scheduled for this day.</p>}
-             </div>
-        )
-      }
-      case 'week': {
-        const weekSchedule = weekdays.slice(0, 5).map(day => ({
-            day: day.charAt(0).toUpperCase() + day.slice(1),
-            schedule: Object.entries(schedule).flatMap(([grade, slots]) => 
-                slots.map(slot => ({
-                    time: slot.time,
-                    grade,
-                    subject: slot[day as keyof typeof slot]
-                })).filter(item => typeof item.subject === 'string' && item.subject !== 'Study Hall' && item.subject !== 'Physical Ed.')
-            ).sort((a, b) => a.time.localeCompare(b.time))
-        }));
-
-        return (
-             <div className="p-4 min-h-[300px] max-h-[500px] overflow-y-auto">
-                 {weekSchedule.map(dayInfo => (
-                     <div key={dayInfo.day} className="mb-6">
-                         <h3 className="font-semibold text-lg border-b pb-2 mb-2">{dayInfo.day}</h3>
-                         {dayInfo.schedule.length > 0 ? (
-                            <ul className="space-y-1 text-sm">
-                                {dayInfo.schedule.map((item, index) => (
-                                    <li key={index} className="flex gap-4">
-                                        <span className="w-24 text-muted-foreground">{item.time}</span>
-                                        <span className="w-28 font-medium">{item.grade}</span>
-                                        <span>{item.subject}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                         ) : <p className="text-sm text-muted-foreground">No classes scheduled.</p>}
-                     </div>
-                 ))}
-             </div>
-        )
-      }
-      case 'list': {
-        const filteredEvents = personalEvents
-          .map(e => ({ ...e, dateObj: new Date(e.date + 'T00:00:00') }))
-          .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
-        
-        return (
-          <div className="p-4 min-h-[300px] max-h-[500px] overflow-y-auto">
-            {filteredEvents.length > 0 ? (
-              <ul className="space-y-3">
-                {filteredEvents.map(event => (
-                  <li key={event.id} className="flex items-start gap-4">
-                    <div className="text-center font-semibold text-primary w-16 flex-shrink-0">
-                      <div className="text-sm">{format(event.dateObj, 'MMM')}</div>
-                      <div className="text-2xl">{format(event.dateObj, 'dd')}</div>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">{event.title}</h4>
-                      <p className="text-sm text-muted-foreground">{event.description}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-center text-muted-foreground pt-16">No events scheduled.</p>
-            )}
-          </div>
-        );
-      }
-      default:
-        return null;
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate);
+    if(selectedDate) {
+        setMonth(selectedDate);
     }
-  };
+  }
 
+  const upcomingEvents = date 
+    ? academicEvents.filter(event => isSameDay(new Date(event.date + 'T00:00:00'), date))
+    : academicEvents.filter(event => new Date(event.date) >= new Date()).slice(0, 5);
+
+  const eventColors = {
+    'Holiday': 'bg-red-500',
+    'Exam': 'bg-blue-500',
+    'Event': 'bg-yellow-500'
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -319,24 +214,69 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-baseline gap-2">
-                <CardTitle className="text-xl font-medium">{format(month, 'MMMM yyyy')}</CardTitle>
-                <Link href="/calendar">
+                <CardTitle className="text-xl font-medium">Academic Calendar</CardTitle>
+                 <Link href="/calendar">
                   <Button variant="link" className="p-0 h-auto text-sm">View Full Calendar</Button>
                 </Link>
             </div>
-            <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleTodayClick}>Today</Button>
-                <div className="flex items-center rounded-md border p-1">
-                    <Button variant={calendarView === 'day' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('day')}>Day</Button>
-                    <Button variant={calendarView === 'week' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('week')}>Week</Button>
-                    <Button variant={calendarView === 'month' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('month')}>Month</Button>
-                    <Button variant={calendarView === 'list' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('list')}>List</Button>
-                </div>
-            </div>
           </CardHeader>
-          <CardContent className="p-0">
-             {renderCalendarContent()}
+          <CardContent className="p-2">
+             <Calendar
+                mode="single"
+                selected={date}
+                onSelect={handleDateSelect}
+                month={month}
+                onMonthChange={setMonth}
+                modifiers={{ 
+                    holiday: eventDatesByType.holiday,
+                    exam: eventDatesByType.exam,
+                    event: eventDatesByType.event,
+                 }}
+                modifiersClassNames={{
+                    holiday: 'day-holiday',
+                    exam: 'day-exam',
+                    event: 'day-event',
+                }}
+                className="w-full"
+              />
           </CardContent>
+          <CardFooter className="flex-col items-start gap-2 border-t pt-4">
+              <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-red-500 fill-current" /> <span>Holiday</span></div>
+                  <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-blue-500 fill-current" /> <span>Exam</span></div>
+                  <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-yellow-500 fill-current" /> <span>Event</span></div>
+              </div>
+          </CardFooter>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>{date ? `Events on ${format(date, 'PPP')}`: 'Upcoming Events'}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {upcomingEvents.length > 0 ? (
+                    <Carousel opts={{ align: "start", loop: false }}>
+                        <CarouselContent>
+                            {upcomingEvents.map(event => (
+                                <CarouselItem key={event.id} className="md:basis-1/2 lg:basis-1/3">
+                                    <div className="p-1">
+                                        <Card className="h-full">
+                                            <CardContent className="flex flex-col items-start gap-2 p-4">
+                                                <Badge className={eventColors[event.type as keyof typeof eventColors]}>{event.type}</Badge>
+                                                <h4 className="font-semibold">{event.title}</h4>
+                                                <p className="text-sm text-muted-foreground">{event.description}</p>
+                                                <p className="text-xs text-muted-foreground pt-2">{format(new Date(event.date + 'T00:00:00'), 'PPP')}</p>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                    </Carousel>
+                ) : (
+                    <p className="text-center text-muted-foreground py-8">No events scheduled for {date ? 'this day' : 'the near future'}.</p>
+                )}
+            </CardContent>
         </Card>
       </div>
 
