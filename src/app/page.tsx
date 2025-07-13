@@ -151,7 +151,7 @@ export default function Dashboard() {
           <CardHeader>
               <CardTitle>Calendar</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex justify-center">
               <Calendar
                   mode="single"
                   selected={selectedDate}
