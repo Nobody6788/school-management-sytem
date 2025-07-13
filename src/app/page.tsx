@@ -2,6 +2,8 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -12,9 +14,10 @@ import { Users, BookUser, Contact, Briefcase, PlusCircle, ChevronLeft, ChevronRi
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { notices, stats, students, teachers, parents, todoList as initialTodoList, personalEvents } from '@/lib/data';
 import { Calendar } from '@/components/ui/calendar';
-import { format, isSameDay } from 'date-fns';
+import { format, isSameDay, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 
 type Todo = (typeof initialTodoList)[0];
+type CalendarView = 'month' | 'week' | 'day' | 'list';
 
 const incomeData = [
   { name: 'Jan', income: 4000, expenses: 2400 },
@@ -34,6 +37,7 @@ export default function Dashboard() {
   const [newTodo, setNewTodo] = useState('');
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [month, setMonth] = useState(date || new Date());
+  const [calendarView, setCalendarView] = useState<CalendarView>('month');
   
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +67,78 @@ export default function Dashboard() {
     setDate(today);
     setMonth(today);
   }
+  
+  const renderCalendarContent = () => {
+    switch (calendarView) {
+      case 'month':
+        return (
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            month={month}
+            onMonthChange={setMonth}
+            modifiers={{ hasEvent: eventDates }}
+            modifiersStyles={{ hasEvent: { position: 'relative' } }}
+            components={{
+              IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+              IconRight: () => <ChevronRight className="h-4 w-4" />,
+              DayContent: (props) => {
+                const hasEvent = eventDates.some(d => isSameDay(d, props.date));
+                return (
+                  <div className="relative h-full w-full flex items-center justify-center">
+                    {props.date.getDate()}
+                    {hasEvent && <div className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
+                  </div>
+                )
+              }
+            }}
+            className="w-full"
+          />
+        );
+      case 'week':
+      case 'day':
+      case 'list':
+        const filteredEvents = personalEvents
+          .map(e => ({ ...e, dateObj: new Date(e.date + 'T00:00:00') }))
+          .filter(e => {
+            if (calendarView === 'day' && date) return isSameDay(e.dateObj, date);
+            if (calendarView === 'week' && date) {
+              const start = startOfWeek(date);
+              const end = endOfWeek(date);
+              return isWithinInterval(e.dateObj, { start, end });
+            }
+            return true; // For list view
+          })
+          .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
+        
+        return (
+          <div className="p-4 min-h-[300px]">
+            {filteredEvents.length > 0 ? (
+              <ul className="space-y-3">
+                {filteredEvents.map(event => (
+                  <li key={event.id} className="flex items-start gap-4">
+                    <div className="text-center font-semibold text-primary w-16 flex-shrink-0">
+                      <div className="text-sm">{format(event.dateObj, 'MMM')}</div>
+                      <div className="text-2xl">{format(event.dateObj, 'dd')}</div>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">{event.title}</h4>
+                      <p className="text-sm text-muted-foreground">{event.description}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-center text-muted-foreground pt-16">No events for this selection.</p>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -198,43 +274,15 @@ export default function Dashboard() {
             <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={handleTodayClick}>Today</Button>
                 <div className="flex items-center rounded-md border p-1">
-                    <Button variant="ghost" size="sm" className="h-7 px-2" disabled>Day</Button>
-                    <Button variant="ghost" size="sm" className="h-7 px-2" disabled>Week</Button>
-                    <Button variant="ghost" size="sm" className="h-7 px-2 bg-muted">Month</Button>
-                    <Button variant="ghost" size="sm" className="h-7 px-2" disabled>List</Button>
+                    <Button variant={calendarView === 'day' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('day')}>Day</Button>
+                    <Button variant={calendarView === 'week' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('week')}>Week</Button>
+                    <Button variant={calendarView === 'month' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('month')}>Month</Button>
+                    <Button variant={calendarView === 'list' ? 'secondary' : 'ghost'} size="sm" className="h-7 px-2" onClick={() => setCalendarView('list')}>List</Button>
                 </div>
             </div>
           </CardHeader>
           <CardContent className="p-0">
-             <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                month={month}
-                onMonthChange={setMonth}
-                modifiers={{
-                  hasEvent: eventDates,
-                }}
-                modifiersStyles={{
-                   hasEvent: {
-                     position: 'relative',
-                   }
-                }}
-                components={{
-                  IconLeft: () => <ChevronLeft className="h-4 w-4" />,
-                  IconRight: () => <ChevronRight className="h-4 w-4" />,
-                  DayContent: (props) => {
-                    const hasEvent = eventDates.some(d => isSameDay(d, props.date));
-                    return (
-                      <div className="relative h-full w-full flex items-center justify-center">
-                        {props.date.getDate()}
-                        {hasEvent && <div className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
-                      </div>
-                    )
-                  }
-                }}
-                className="w-full"
-             />
+             {renderCalendarContent()}
           </CardContent>
         </Card>
       </div>
@@ -242,3 +290,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
