@@ -7,6 +7,7 @@ import { DayPicker, type DayPickerProps, type DayProps } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { add, format, isSameDay, startOfWeek, endOfWeek, isWithinInterval } from "date-fns"
 
 type CalendarView = 'month' | 'week' | 'day' | 'list';
@@ -205,57 +206,59 @@ function Calendar({
   }
 
   return (
-    <>
-      <DayPicker
-        showOutsideDays={showOutsideDays}
-        className={cn("p-3", className)}
-        classNames={{
-          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-          month: "space-y-4 w-full",
-          caption: "flex justify-center pt-1 relative items-center",
-          caption_label: "hidden", // We use a custom caption component
-          table: "w-full border-collapse space-y-1",
-          head_row: "flex",
-          head_cell:
-            "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-          row: "flex w-full mt-2",
-          cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
-          day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
-          day_selected:
-            "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-          day_today: "bg-accent text-accent-foreground",
-          day_outside: "day-outside text-muted-foreground opacity-50",
-          day_disabled: "text-muted-foreground opacity-50",
-          ...classNames,
-        }}
-        components={{
-          Caption: (captionProps) => (
-            <Caption
-              displayMonth={captionProps.displayMonth}
-              onMonthChange={setMonth}
-              view={view}
-              onViewChange={setView}
-            />
-          ),
-          DayContent: DayContent,
-        }}
-        month={month}
+    <div>
+      <Caption
+        displayMonth={month}
         onMonthChange={setMonth}
-        selected={selectedDate}
-        onDayClick={handleDayClick}
-        {...props}
+        view={view}
+        onViewChange={setView}
       />
+      <Separator className="my-2" />
       {view === 'month' && (
-        <div className="flex items-center justify-center gap-4 text-sm p-4 border-t">
-          <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-red-500 fill-current" /> <span>Holiday</span></div>
-          <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-blue-500 fill-current" /> <span>Exam</span></div>
-          <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-yellow-500 fill-current" /> <span>Event</span></div>
-        </div>
+        <>
+          <DayPicker
+            showOutsideDays={showOutsideDays}
+            className={cn("p-3", className)}
+            classNames={{
+              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+              month: "space-y-4 w-full",
+              caption: "flex justify-center pt-1 relative items-center",
+              caption_label: "hidden", // We use a custom caption component
+              table: "w-full border-collapse space-y-1",
+              head_row: "flex",
+              head_cell:
+                "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
+              row: "flex w-full mt-2",
+              cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
+              day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
+              day_selected:
+                "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+              day_today: "bg-accent text-accent-foreground",
+              day_outside: "day-outside text-muted-foreground opacity-50",
+              day_disabled: "text-muted-foreground opacity-50",
+              ...classNames,
+            }}
+            components={{
+              Caption: () => null, // Hide default caption, we use our own
+              DayContent: DayContent,
+            }}
+            month={month}
+            onMonthChange={setMonth}
+            selected={selectedDate}
+            onDayClick={handleDayClick}
+            {...props}
+          />
+          <div className="flex items-center justify-center gap-4 text-sm p-4 border-t">
+            <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-red-500 fill-current" /> <span>Holiday</span></div>
+            <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-blue-500 fill-current" /> <span>Exam</span></div>
+            <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-yellow-500 fill-current" /> <span>Event</span></div>
+          </div>
+        </>
       )}
       {view === 'day' && renderDayView()}
       {view === 'week' && renderWeekView()}
       {view === 'list' && renderListView()}
-    </>
+    </div>
   );
 }
 Calendar.displayName = "Calendar"
