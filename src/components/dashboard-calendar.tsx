@@ -117,40 +117,24 @@ function DashboardCalendar({
   const renderWeekView = () => {
     if (!selectedDate) return <div className="p-4 text-center text-muted-foreground">No date selected.</div>;
 
-    const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const start = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
     const weekDays = Array.from({ length: 5 }, (_, i) => add(start, { days: i }));
-    const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
     return (
-        <div className="p-4 space-y-4 max-h-[400px] overflow-y-auto">
-            {weekDays.map((day, i) => {
-                const dayKey = dayKeys[i];
-                const daySchedule = Object.entries(schedule).flatMap(([grade, slots]) => 
-                    slots.map(slot => ({
-                        grade,
-                        time: slot.time,
-                        subject: slot[dayKey] || 'No Class'
-                    })).filter(item => item.subject !== 'No Class' && item.subject !== 'Study Hall' && item.subject !== 'Physical Ed.')
-                ).sort((a,b) => a.time.localeCompare(b.time));
-                
-                const dayEvents = eventsByDate.get(format(day, 'yyyy-MM-dd')) || [];
-
-                return (
-                    <div key={dayKey}>
-                        <h4 className="font-semibold mb-1">{format(day, 'eeee, PPP')}</h4>
-                        {(daySchedule.length > 0 || dayEvents.length > 0) ? (
-                             <ul className="text-sm text-muted-foreground list-disc pl-5">
-                                {dayEvents.map(event => <li key={event.id}><strong>Event:</strong> {event.title}</li>)}
-                                {daySchedule.map((item, index) => (
-                                    <li key={index}><strong>{item.time}</strong> - {item.grade}: {item.subject}</li>
-                                ))}
-                            </ul>
-                        ): <p className="text-sm text-muted-foreground pl-5">No classes or events scheduled.</p>}
-                    </div>
-                )
-            })}
+        <div className="p-4 grid grid-cols-5 gap-2">
+            {weekDays.map((day) => (
+                 <Button
+                    key={day.toISOString()}
+                    variant={isSameDay(day, selectedDate) ? 'default' : 'outline'}
+                    className="flex flex-col h-auto p-2"
+                    onClick={() => handleDayClick(day)}
+                 >
+                    <span className="text-xs">{format(day, 'EEE')}</span>
+                    <span className="text-lg font-bold">{format(day, 'd')}</span>
+                </Button>
+            ))}
         </div>
-    )
+    );
   }
 
   const renderListView = () => {
@@ -192,7 +176,7 @@ function DashboardCalendar({
                   <ChevronLeft />
               </Button>
             </div>
-             <Button variant="outline" size="sm" className="h-7" onClick={() => setMonth(new Date())}>
+             <Button variant="outline" size="sm" className="h-7" onClick={() => { setMonth(new Date()); setSelectedDate(new Date()); }}>
               Today
             </Button>
             <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
@@ -268,3 +252,4 @@ function DashboardCalendar({
 DashboardCalendar.displayName = "DashboardCalendar"
 
 export { DashboardCalendar }
+
