@@ -147,16 +147,15 @@ export default function Dashboard() {
             </Card>
         </div>
 
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 flex flex-col">
              <CardHeader>
                 <CardTitle>Calendar</CardTitle>
              </CardHeader>
-             <CardContent className="flex justify-center">
+             <CardContent className="flex-1 flex justify-center items-center">
                  <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={setSelectedDate}
-                    className="rounded-md border"
                     modifiers={{
                         hasEvent: personalEvents.map(e => new Date(e.date + 'T00:00:00')),
                     }}
