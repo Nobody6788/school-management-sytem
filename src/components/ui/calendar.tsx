@@ -19,6 +19,60 @@ export type CalendarProps = DayPickerProps & {
     schedule?: Schedule;
 };
 
+function Caption(props: {
+  displayMonth: Date;
+  onMonthChange: (date: Date) => void;
+  view: CalendarView;
+  onViewChange: (view: CalendarView) => void;
+}) {
+  const handleMonthChange = (offset: number) => {
+    props.onMonthChange(add(props.displayMonth, { months: offset }));
+  };
+
+  const handleYearChange = (offset: number) => {
+    props.onMonthChange(add(props.displayMonth, { years: offset }));
+  };
+
+  return (
+    <div className="flex items-center justify-between p-2">
+      <div className="flex items-center gap-1 rounded-md border p-1">
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleYearChange(-1)}>
+          <ChevronsLeft />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleMonthChange(-1)}>
+          <ChevronLeft />
+        </Button>
+        <Button variant="outline" size="sm" className="h-7" onClick={() => props.onMonthChange(new Date())}>
+          Today
+        </Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleMonthChange(1)}>
+          <ChevronRight />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleYearChange(1)}>
+          <ChevronsRight />
+        </Button>
+      </div>
+
+      <h2 className="text-lg font-bold">{format(props.displayMonth, 'MMMM yyyy')}</h2>
+
+      <div className="flex items-center gap-1 rounded-md border p-1">
+        {(['month', 'week', 'day', 'list'] as CalendarView[]).map((v) => (
+          <Button
+            key={v}
+            variant={props.view === v ? 'default' : 'ghost'}
+            size="sm"
+            className="h-7 capitalize"
+            onClick={() => props.onViewChange(v)}
+          >
+            {v}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
 function Calendar({
   className,
   classNames,
@@ -42,13 +96,6 @@ function Calendar({
     });
     return map;
   }, [events]);
-
-  const modifiers = React.useMemo(() => ({
-    holiday: events.filter(e => e.type === 'Holiday').map(e => new Date(e.date + 'T00:00:00')),
-    exam: events.filter(e => e.type === 'Exam').map(e => new Date(e.date + 'T00:00:00')),
-    event: events.filter(e => e.type === 'Event').map(e => new Date(e.date + 'T00:00:00')),
-  }), [events]);
-  
 
   const handleDayClick = (day: Date) => {
     setSelectedDate(day);
@@ -159,69 +206,57 @@ function Calendar({
 
   return (
     <>
-        <div className="flex justify-between items-center p-4">
-            <div className="flex items-center gap-1">
-                <div className="flex rounded-md border">
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-r-none border-r" onClick={() => setMonth(add(month, {years: -1}))}><ChevronsLeft /></Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-none" onClick={() => setMonth(add(month, {months: -1}))}><ChevronLeft /></Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-none border-l" onClick={() => setMonth(add(month, {months: 1}))}><ChevronRight /></Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-l-none border-l" onClick={() => setMonth(add(month, {years: 1}))}><ChevronsRight /></Button>
-                </div>
-                <Button variant="outline" className="h-8" onClick={() => setMonth(new Date())}>Today</Button>
-            </div>
-
-            <h2 className="text-lg font-semibold text-center">{format(month, 'MMMM yyyy')}</h2>
-
-             <div className="flex rounded-md border">
-                <Button variant={view === 'month' ? 'default' : 'outline'} size="sm" onClick={() => setView('month')} className="h-8 rounded-r-none border-r">Month</Button>
-                <Button variant={view === 'week' ? 'default' : 'outline'} size="sm" onClick={() => setView('week')} className="h-8 rounded-none">Week</Button>
-                <Button variant={view === 'day' ? 'default' : 'outline'} size="sm" onClick={() => setView('day')} className="h-8 rounded-none border-x">Day</Button>
-                <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setView('list')} className="h-8 rounded-l-none">List</Button>
-            </div>
-        </div>
-
-        {view === 'month' && (
-            <DayPicker
-            showOutsideDays={showOutsideDays}
-            className={cn("p-3", className)}
-            classNames={{
-                months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                month: "space-y-4 w-full",
-                caption: "hidden", // Use custom header
-                table: "w-full border-collapse space-y-1",
-                head_row: "flex",
-                head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-                row: "flex w-full mt-2",
-                cell: "h-auto p-0 relative focus-within:relative focus-within:z-20",
-                day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                day_today: "bg-accent text-accent-foreground",
-                day_outside: "text-muted-foreground opacity-50",
-                day_disabled: "text-muted-foreground opacity-50",
-                ...classNames,
-            }}
-            components={{ DayContent }}
-            month={month}
-            onMonthChange={setMonth}
-            selected={selectedDate}
-            onDayClick={handleDayClick}
-            modifiers={modifiers}
-            {...props}
+      <DayPicker
+        showOutsideDays={showOutsideDays}
+        className={cn("p-3", className)}
+        classNames={{
+          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+          month: "space-y-4 w-full",
+          caption: "flex justify-center pt-1 relative items-center",
+          caption_label: "hidden", // We use a custom caption component
+          table: "w-full border-collapse space-y-1",
+          head_row: "flex",
+          head_cell:
+            "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
+          row: "flex w-full mt-2",
+          cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
+          day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
+          day_selected:
+            "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+          day_today: "bg-accent text-accent-foreground",
+          day_outside: "day-outside text-muted-foreground opacity-50",
+          day_disabled: "text-muted-foreground opacity-50",
+          ...classNames,
+        }}
+        components={{
+          Caption: (captionProps) => (
+            <Caption
+              displayMonth={captionProps.displayMonth}
+              onMonthChange={setMonth}
+              view={view}
+              onViewChange={setView}
             />
-        )}
-        {view === 'day' && renderDayView()}
-        {view === 'week' && renderWeekView()}
-        {view === 'list' && renderListView()}
-
-        {view === 'month' && (
-             <div className="flex items-center justify-center gap-4 text-sm p-4 border-t">
-                <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-red-500 fill-current" /> <span>Holiday</span></div>
-                <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-blue-500 fill-current" /> <span>Exam</span></div>
-                <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-yellow-500 fill-current" /> <span>Event</span></div>
-            </div>
-        )}
+          ),
+          DayContent: DayContent,
+        }}
+        month={month}
+        onMonthChange={setMonth}
+        selected={selectedDate}
+        onDayClick={handleDayClick}
+        {...props}
+      />
+      {view === 'month' && (
+        <div className="flex items-center justify-center gap-4 text-sm p-4 border-t">
+          <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-red-500 fill-current" /> <span>Holiday</span></div>
+          <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-blue-500 fill-current" /> <span>Exam</span></div>
+          <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-yellow-500 fill-current" /> <span>Event</span></div>
+        </div>
+      )}
+      {view === 'day' && renderDayView()}
+      {view === 'week' && renderWeekView()}
+      {view === 'list' && renderListView()}
     </>
-  )
+  );
 }
 Calendar.displayName = "Calendar"
 
