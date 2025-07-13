@@ -36,27 +36,31 @@ function Caption(props: {
 
   return (
     <div className="flex items-center justify-between p-2">
-      <div className="flex items-center gap-1 rounded-md border p-1">
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleYearChange(-1)}>
-          <ChevronsLeft />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleMonthChange(-1)}>
-          <ChevronLeft />
-        </Button>
-        <Button variant="outline" size="sm" className="h-7" onClick={() => props.onMonthChange(new Date())}>
-          Today
-        </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleMonthChange(1)}>
-          <ChevronRight />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleYearChange(1)}>
-          <ChevronsRight />
-        </Button>
+      <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
+             <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(-1)}>
+                <ChevronsLeft />
+            </Button>
+            <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(-1)}>
+                <ChevronLeft />
+            </Button>
+          </div>
+           <Button variant="outline" size="sm" className="h-7" onClick={() => props.onMonthChange(new Date())}>
+            Today
+          </Button>
+          <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
+            <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(1)}>
+                <ChevronRight />
+            </Button>
+            <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(1)}>
+                <ChevronsRight />
+            </Button>
+          </div>
       </div>
 
       <h2 className="text-lg font-bold">{format(props.displayMonth, 'MMMM yyyy')}</h2>
 
-      <div className="flex items-center gap-1 rounded-md border p-1">
+      <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
         {(['month', 'week', 'day', 'list'] as CalendarView[]).map((v) => (
           <Button
             key={v}
@@ -108,14 +112,16 @@ function Calendar({
     const eventTypes = new Set(dayEvents.map(e => e.type));
     
     return (
-        <div className="relative h-full w-full flex items-center justify-center">
-        {dayProps.date.getDate()}
-        <div className="absolute bottom-1 flex space-x-0.5">
+      <div className="relative h-full w-full flex flex-col items-center justify-center p-1">
+        <span>{dayProps.date.getDate()}</span>
+        {dayEvents.length > 0 && (
+          <div className="absolute bottom-1 flex space-x-0.5">
             {eventTypes.has('Holiday') && <Circle className="h-1.5 w-1.5 text-red-500 fill-current" />}
             {eventTypes.has('Exam') && <Circle className="h-1.5 w-1.5 text-blue-500 fill-current" />}
             {eventTypes.has('Event') && <Circle className="h-1.5 w-1.5 text-yellow-500 fill-current" />}
-        </div>
-        </div>
+          </div>
+        )}
+      </div>
     );
   };
   
@@ -206,58 +212,53 @@ function Calendar({
   }
 
   return (
-    <div>
-      <Caption
-        displayMonth={month}
-        onMonthChange={setMonth}
-        view={view}
-        onViewChange={setView}
-      />
-      <Separator className="my-2" />
-      {view === 'month' && (
-        <>
-          <DayPicker
-            showOutsideDays={showOutsideDays}
-            className={cn("p-3", className)}
-            classNames={{
-              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-              month: "space-y-4 w-full",
-              caption: "flex justify-center pt-1 relative items-center",
-              caption_label: "hidden", // We use a custom caption component
-              table: "w-full border-collapse space-y-1",
-              head_row: "flex",
-              head_cell:
-                "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-              row: "flex w-full mt-2",
-              cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
-              day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
-              day_selected:
-                "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-              day_today: "bg-accent text-accent-foreground",
-              day_outside: "day-outside text-muted-foreground opacity-50",
-              day_disabled: "text-muted-foreground opacity-50",
-              ...classNames,
-            }}
-            components={{
-              Caption: () => null, // Hide default caption, we use our own
-              DayContent: DayContent,
-            }}
-            month={month}
+    <div className="w-full">
+        <Caption
+            displayMonth={month}
             onMonthChange={setMonth}
-            selected={selectedDate}
-            onDayClick={handleDayClick}
-            {...props}
-          />
-          <div className="flex items-center justify-center gap-4 text-sm p-4 border-t">
-            <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-red-500 fill-current" /> <span>Holiday</span></div>
-            <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-blue-500 fill-current" /> <span>Exam</span></div>
-            <div className="flex items-center gap-2"><Circle className="h-3 w-3 text-yellow-500 fill-current" /> <span>Event</span></div>
-          </div>
-        </>
-      )}
-      {view === 'day' && renderDayView()}
-      {view === 'week' && renderWeekView()}
-      {view === 'list' && renderListView()}
+            view={view}
+            onViewChange={setView}
+        />
+        <Separator className="my-2" />
+        <div className="mt-2">
+            {view === 'month' && (
+                <DayPicker
+                showOutsideDays={showOutsideDays}
+                className={cn("p-3", className)}
+                classNames={{
+                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                    month: "space-y-4 w-full",
+                    caption: "hidden", // We use a custom caption component
+                    caption_label: "hidden",
+                    table: "w-full border-collapse space-y-1",
+                    head_row: "flex w-full",
+                    head_cell:
+                    "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
+                    row: "flex w-full mt-2",
+                    cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
+                    day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
+                    day_selected:
+                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                    day_today: "bg-accent text-accent-foreground",
+                    day_outside: "day-outside text-muted-foreground opacity-50",
+                    day_disabled: "text-muted-foreground opacity-50",
+                    ...classNames,
+                }}
+                components={{
+                    Caption: () => null, // Hide default caption, we use our own
+                    DayContent: DayContent,
+                }}
+                month={month}
+                onMonthChange={setMonth}
+                selected={selectedDate}
+                onDayClick={handleDayClick}
+                {...props}
+                />
+            )}
+            {view === 'day' && renderDayView()}
+            {view === 'week' && renderWeekView()}
+            {view === 'list' && renderListView()}
+        </div>
     </div>
   );
 }

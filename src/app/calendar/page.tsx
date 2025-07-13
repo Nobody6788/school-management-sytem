@@ -102,11 +102,6 @@ export default function PersonalCalendarPage() {
               exam: eventDatesByType.exam,
               event: eventDatesByType.event,
             }}
-            modifiersClassNames={{
-              holiday: 'day-holiday',
-              exam: 'day-exam',
-              event: 'day-event',
-            }}
           />
         </CardContent>
       </Card>
