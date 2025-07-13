@@ -29,12 +29,6 @@ const incomeData = [
   { name: 'Jul', income: 3490, expenses: 4300 },
 ];
 
-const eventDatesByType = {
-    holiday: academicEvents.filter(e => e.type === 'Holiday').map(e => new Date(e.date + 'T00:00:00')),
-    exam: academicEvents.filter(e => e.type === 'Exam').map(e => new Date(e.date + 'T00:00:00')),
-    event: academicEvents.filter(e => e.type === 'Event').map(e => new Date(e.date + 'T00:00:00')),
-};
-
 export default function Dashboard() {
   const [todoList, setTodoList] = useState<Todo[]>(initialTodoList);
   const [newTodo, setNewTodo] = useState('');
