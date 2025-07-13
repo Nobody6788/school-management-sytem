@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { TodoItem } from '@/components/todo-item';
 import { Users, BookUser, Contact, Briefcase, PlusCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { notices, stats, students, teachers, parents, todoList as initialTodoList } from '@/lib/data';
+import { notices, stats, students, teachers, parents, todoList as initialTodoList, personalEvents } from '@/lib/data';
+import { Calendar } from '@/components/ui/calendar';
 
 type Todo = (typeof initialTodoList)[0];
 
@@ -24,9 +25,13 @@ const incomeData = [
   { name: 'Jul', income: 3490, expenses: 4300 },
 ];
 
+// Convert event dates for the calendar
+const eventDates = personalEvents.map(event => new Date(event.date + 'T00:00:00'));
+
 export default function Dashboard() {
   const [todoList, setTodoList] = useState<Todo[]>(initialTodoList);
   const [newTodo, setNewTodo] = useState('');
+  const [date, setDate] = useState<Date | undefined>(new Date());
   
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,6 +180,40 @@ export default function Dashboard() {
                     )}
                 </div>
             </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Calendar</CardTitle>
+          </CardHeader>
+          <CardContent>
+             <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                modifiers={{
+                  hasEvent: eventDates,
+                }}
+                modifiersStyles={{
+                   hasEvent: {
+                     position: 'relative',
+                   }
+                }}
+                components={{
+                  DayContent: (props) => {
+                    const hasEvent = eventDates.some(d => d.getDate() === props.date.getDate() && d.getMonth() === props.date.getMonth() && d.getFullYear() === props.date.getFullYear());
+                    return (
+                      <div className="relative h-full w-full flex items-center justify-center">
+                        {props.date.getDate()}
+                        {hasEvent && <div className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
+                      </div>
+                    )
+                  }
+                }}
+             />
+          </CardContent>
         </Card>
       </div>
 
