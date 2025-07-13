@@ -8,7 +8,7 @@ import { DayPicker, type DayProps } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { add, format, isSameDay, startOfWeek } from "date-fns"
+import { add, format, isSameDay, startOfWeek, endOfWeek } from "date-fns"
 
 export type CalendarView = 'month' | 'week' | 'day' | 'list';
 
@@ -252,4 +252,5 @@ function DashboardCalendar({
 DashboardCalendar.displayName = "DashboardCalendar"
 
 export { DashboardCalendar }
+
 
