@@ -148,26 +148,26 @@ export default function Dashboard() {
         </div>
 
         <Card className="lg:col-span-1 flex flex-col">
-             <CardHeader>
-                <CardTitle>Calendar</CardTitle>
-             </CardHeader>
-             <CardContent className="flex-1 flex justify-center items-center">
-                 <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    modifiers={{
-                        hasEvent: personalEvents.map(e => new Date(e.date + 'T00:00:00')),
-                    }}
-                    modifiersStyles={{
-                        hasEvent: {
-                            fontWeight: 'bold',
-                            textDecoration: 'underline',
-                            textDecorationColor: 'hsl(var(--primary))'
-                        },
-                    }}
-                 />
-            </CardContent>
+          <CardHeader>
+              <CardTitle>Calendar</CardTitle>
+          </CardHeader>
+          <CardContent>
+              <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  modifiers={{
+                      hasEvent: personalEvents.map(e => new Date(e.date + 'T00:00:00')),
+                  }}
+                  modifiersStyles={{
+                      hasEvent: {
+                          fontWeight: 'bold',
+                          textDecoration: 'underline',
+                          textDecorationColor: 'hsl(var(--primary))'
+                      },
+                  }}
+              />
+          </CardContent>
         </Card>
       </div>
 
