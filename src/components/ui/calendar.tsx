@@ -137,20 +137,36 @@ function Calendar({
       })).filter(item => item.subject !== 'No Class' && item.subject !== 'Study Hall' && item.subject !== 'Physical Ed.')
     ).sort((a,b) => a.time.localeCompare(b.time));
 
+    const dayEvents = eventsByDate.get(format(selectedDate, 'yyyy-MM-dd')) || [];
+
     return (
-        <div className="p-4">
+        <div className="p-4 space-y-4">
             <h3 className="font-semibold text-lg mb-2">Schedule for {format(selectedDate, 'PPP')}</h3>
+            {dayEvents.length > 0 && (
+                <div>
+                    <h4 className="font-medium">Events</h4>
+                    <ul className="text-sm text-muted-foreground list-disc pl-5">
+                       {dayEvents.map(event => <li key={event.id}>{event.title}</li>)}
+                    </ul>
+                </div>
+            )}
             {todaysSchedule.length > 0 ? (
-                 <table className="w-full text-sm">
-                    <thead className="text-left"><tr><th className="p-2">Time</th><th className="p-2">Grade</th><th className="p-2">Subject</th></tr></thead>
-                    <tbody>
-                        {todaysSchedule.map((item, index) => (
-                             <tr key={index} className="border-b"><td className="p-2">{item.time}</td><td className="p-2">{item.grade}</td><td className="p-2">{item.subject}</td></tr>
-                        ))}
-                    </tbody>
-                 </table>
+                <div>
+                    <h4 className="font-medium">Classes</h4>
+                     <table className="w-full text-sm">
+                        <thead className="text-left"><tr><th className="p-2">Time</th><th className="p-2">Grade</th><th className="p-2">Subject</th></tr></thead>
+                        <tbody>
+                            {todaysSchedule.map((item, index) => (
+                                 <tr key={index} className="border-b"><td className="p-2">{item.time}</td><td className="p-2">{item.grade}</td><td className="p-2">{item.subject}</td></tr>
+                            ))}
+                        </tbody>
+                     </table>
+                 </div>
             ) : (
-                <p className="text-muted-foreground">No classes scheduled for this day.</p>
+                <p className="text-muted-foreground text-sm">No classes scheduled for this day.</p>
+            )}
+            {dayEvents.length === 0 && todaysSchedule.length === 0 && (
+                <p className="text-muted-foreground">No classes or events scheduled for this day.</p>
             )}
         </div>
     )
@@ -159,7 +175,7 @@ function Calendar({
   const renderWeekView = () => {
     if (!selectedDate) return <div className="p-4 text-center text-muted-foreground">No date selected.</div>;
 
-    const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const start = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
     const weekDays = Array.from({ length: 5 }, (_, i) => add(start, { days: i }));
     const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
@@ -174,17 +190,20 @@ function Calendar({
                         subject: slot[dayKey] || 'No Class'
                     })).filter(item => item.subject !== 'No Class' && item.subject !== 'Study Hall' && item.subject !== 'Physical Ed.')
                 ).sort((a,b) => a.time.localeCompare(b.time));
+                
+                const dayEvents = eventsByDate.get(format(day, 'yyyy-MM-dd')) || [];
 
                 return (
                     <div key={dayKey}>
                         <h4 className="font-semibold mb-1">{format(day, 'eeee, PPP')}</h4>
-                        {daySchedule.length > 0 ? (
+                        {(daySchedule.length > 0 || dayEvents.length > 0) ? (
                              <ul className="text-sm text-muted-foreground list-disc pl-5">
+                                {dayEvents.map(event => <li key={event.id}><strong>Event:</strong> {event.title}</li>)}
                                 {daySchedule.map((item, index) => (
                                     <li key={index}><strong>{item.time}</strong> - {item.grade}: {item.subject}</li>
                                 ))}
                             </ul>
-                        ): <p className="text-sm text-muted-foreground pl-5">No classes scheduled.</p>}
+                        ): <p className="text-sm text-muted-foreground pl-5">No classes or events scheduled.</p>}
                     </div>
                 )
             })}
@@ -196,9 +215,9 @@ function Calendar({
      return (
         <div className="p-4">
             <h3 className="font-semibold text-lg mb-2">All Upcoming Events</h3>
-            {events.filter(e => new Date(e.date) >= new Date()).length > 0 ? (
+            {events.filter(e => new Date(e.date + 'T00:00:00') >= startOfWeek(new Date(), { weekStartsOn: 1 })).length > 0 ? (
                 <ul className="space-y-2">
-                    {events.filter(e => new Date(e.date) >= new Date()).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(event => (
+                    {events.filter(e => new Date(e.date + 'T00:00:00') >= startOfWeek(new Date(), { weekStartsOn: 1 })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(event => (
                         <li key={event.id} className="text-sm">
                             <strong className="font-semibold">{format(new Date(event.date + 'T00:00:00'), 'PPP')}</strong>: {event.title}
                         </li>
@@ -220,7 +239,7 @@ function Calendar({
             onViewChange={setView}
         />
         <Separator className="my-2" />
-        <div className="mt-2">
+        <div className="mt-2 min-h-[295px]">
             {view === 'month' && (
                 <DayPicker
                 showOutsideDays={showOutsideDays}
