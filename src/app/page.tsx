@@ -187,20 +187,6 @@ export default function Dashboard() {
             schedule={schedule}
             className="w-full"
           />
-           <CardFooter className="flex gap-x-4 gap-y-2 flex-wrap border-t p-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Circle className="h-3 w-3 text-red-500 fill-current" />
-                <span>Holiday</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Circle className="h-3 w-3 text-blue-500 fill-current" />
-                <span>Exam</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Circle className="h-3 w-3 text-yellow-500 fill-current" />
-                <span>Event</span>
-              </div>
-          </CardFooter>
         </Card>
       </div>
     </div>

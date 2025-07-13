@@ -49,16 +49,19 @@ function DashboardCalendar({
 
   const DayContent = (dayProps: DayProps) => {
     const dayEvents = eventsByDate.get(format(dayProps.date, 'yyyy-MM-dd')) || [];
-    const eventTypes = new Set(dayEvents.map(e => e.type));
-    
+    const eventCount = dayEvents.length;
+
     return (
-      <div className="relative h-full w-full flex flex-col items-center justify-center p-1">
+      <div 
+        className={cn("relative h-full w-full flex flex-col items-start justify-start p-2", {
+          "bg-primary text-primary-foreground": isSameDay(dayProps.date, selectedDate || new Date())
+        })}
+        onClick={() => handleDayClick(dayProps.date)}
+      >
         <span>{dayProps.date.getDate()}</span>
-        {dayEvents.length > 0 && (
-          <div className="absolute bottom-1 flex space-x-0.5">
-            {eventTypes.has('Holiday') && <Circle className="h-1.5 w-1.5 text-red-500 fill-current" />}
-            {eventTypes.has('Exam') && <Circle className="h-1.5 w-1.5 text-blue-500 fill-current" />}
-            {eventTypes.has('Event') && <Circle className="h-1.5 w-1.5 text-yellow-500 fill-current" />}
+        {eventCount > 0 && (
+          <div className="absolute bottom-1 right-1 text-xs">
+            {eventCount > 1 ? `+${eventCount - 1} more` : dayEvents[0].title}
           </div>
         )}
       </div>
@@ -76,35 +79,33 @@ function DashboardCalendar({
   
     return (
       <div className="flex items-center justify-between p-2">
-        <div className="flex items-center gap-1">
-            <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
-               <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(-1)}>
+        <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded-md border bg-background p-1">
+               <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleYearChange(-1)}>
                   <ChevronsLeft />
               </Button>
-              <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(-1)}>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleMonthChange(-1)}>
                   <ChevronLeft />
               </Button>
-            </div>
-             <Button variant="outline" size="sm" className="h-7" onClick={() => { setMonth(new Date()); setSelectedDate(new Date()); }}>
-              Today
-            </Button>
-            <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
-              <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(1)}>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleMonthChange(1)}>
                   <ChevronRight />
               </Button>
-              <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(1)}>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleYearChange(1)}>
                   <ChevronsRight />
               </Button>
             </div>
+             <Button variant="secondary" size="sm" className="h-10 px-4" onClick={() => { setMonth(new Date()); setSelectedDate(new Date()); }}>
+              Today
+            </Button>
         </div>
   
-        <h2 className="text-lg font-bold">{format(month, 'MMMM yyyy')}</h2>
+        <h2 className="text-xl font-bold">{format(month, 'MMMM yyyy')}</h2>
   
-        <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
-            <Button variant={view === 'month' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('month')}>month</Button>
-            <Button variant={view === 'week' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('week')}>week</Button>
-            <Button variant={view === 'day' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('day')}>day</Button>
-            <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('list')}>list</Button>
+        <div className="flex items-center gap-1 rounded-lg border bg-background p-1">
+            <Button variant={view === 'month' ? 'default' : 'ghost'} size="sm" className="h-8" onClick={() => setView('month')}>Month</Button>
+            <Button variant={view === 'week' ? 'default' : 'ghost'} size="sm" className="h-8" onClick={() => setView('week')}>Week</Button>
+            <Button variant={view === 'day' ? 'default' : 'ghost'} size="sm" className="h-8" onClick={() => setView('day')}>Day</Button>
+            <Button variant={view === 'list' ? 'default' : 'ghost'} size="sm" className="h-8" onClick={() => setView('list')}>List</Button>
         </div>
       </div>
     );
@@ -149,34 +150,24 @@ function DashboardCalendar({
   };
   
   const renderWeekView = () => {
-    const weekStart = startOfWeek(selectedDate || new Date(), { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(selectedDate || new Date(), { weekStartsOn: 1 });
+    const weekStart = startOfWeek(selectedDate || new Date());
+    const weekEnd = endOfWeek(selectedDate || new Date());
     const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
-  
+
     return (
-      <div className="grid grid-cols-1 md:grid-cols-5 divide-x">
-        {days.slice(0, 5).map(day => {
-          const dayOfWeek = format(day, 'EEEE').toLowerCase();
-          const dayEvents = eventsByDate.get(format(day, 'yyyy-MM-dd')) || [];
-          const dayClasses: { time: string; grade: string; subject: string }[] = [];
-          Object.entries(schedule).forEach(([grade, slots]) => {
-            slots.forEach(slot => {
-              const subject = slot[dayOfWeek as keyof typeof slot];
-              if (subject && subject !== 'Study Hall' && subject !== 'Physical Ed.') {
-                dayClasses.push({ time: slot.time, grade, subject });
-              }
-            });
-          });
-          return (
-            <div key={day.toISOString()} className="p-2">
-              <h4 className="font-bold text-center border-b pb-2 mb-2">{format(day, 'EEE, MMM d')}</h4>
-              <ul className="space-y-2 text-xs">
-                {dayEvents.map(event => <li key={event.id}>{event.title}</li>)}
-                {dayClasses.map((c, i) => <li key={i}>{c.time} - {c.grade}: {c.subject}</li>)}
-              </ul>
-            </div>
-          )
-        })}
+      <div className="grid grid-cols-7 border-t border-l">
+        {days.map((day) => (
+          <div
+            key={day.toISOString()}
+            className="p-2 border-r border-b min-h-[120px] cursor-pointer hover:bg-muted/50"
+            onClick={() => handleDayClick(day)}
+          >
+            <h4 className={cn("font-bold text-center pb-2 mb-2", { "text-primary": isSameDay(day, new Date()) })}>
+              {format(day, 'EEE d')}
+            </h4>
+            {/* Simple event indicators could go here */}
+          </div>
+        ))}
       </div>
     );
   };
@@ -201,55 +192,53 @@ function DashboardCalendar({
   };
 
   const renderContent = () => {
-      switch (view) {
-          case 'month':
-              return (
-                  <DayPicker
-                      showOutsideDays
-                      className="p-0"
-                      classNames={{
-                          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                          month: "space-y-4 w-full",
-                          caption: "hidden",
-                          table: "w-full border-collapse space-y-1",
-                          head_row: "flex w-full",
-                          head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-                          row: "flex w-full mt-2",
-                          cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                          day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
-                          day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                          day_today: "bg-accent text-accent-foreground",
-                          day_outside: "day-outside text-muted-foreground opacity-50",
-                          day_disabled: "text-muted-foreground opacity-50",
-                      }}
-                      components={{
-                          DayContent: DayContent,
-                      }}
-                      month={month}
-                      onMonthChange={setMonth}
-                      selected={selectedDate}
-                      onDayClick={handleDayClick}
-                      {...props}
-                  />
-              );
-          case 'week':
-              return renderWeekView();
-          case 'day':
-              return renderDayView();
-          case 'list':
-              return renderListView();
-          default:
-              return null;
-      }
+    switch (view) {
+      case 'month':
+        return (
+          <DayPicker
+            showOutsideDays
+            className="p-0"
+            classNames={{
+              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+              month: "space-y-4 w-full border-t",
+              caption: "hidden",
+              head_row: "flex w-full border-b",
+              head_cell: "text-muted-foreground font-normal text-sm w-full h-12 flex items-center justify-center border-x",
+              row: "flex w-full",
+              cell: "h-auto p-0 text-left text-sm focus-within:relative focus-within:z-20 w-full min-h-[7rem] border-x border-b",
+              day: "h-full w-full p-1 font-normal aria-selected:opacity-100",
+              day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+              day_today: "bg-accent text-accent-foreground",
+              day_outside: "day-outside text-muted-foreground opacity-50",
+              day_disabled: "text-muted-foreground opacity-50",
+            }}
+            components={{
+              DayContent: DayContent,
+            }}
+            month={month}
+            onMonthChange={setMonth}
+            selected={selectedDate}
+            onDayClick={(day) => setSelectedDate(day)}
+            {...props}
+          />
+        );
+      case 'week':
+        return renderWeekView();
+      case 'day':
+        return renderDayView();
+      case 'list':
+        return renderListView();
+      default:
+        return null;
+    }
   };
 
 
   return (
     <div className={cn("w-full", className)}>
         <CustomCaption />
-        <Separator />
         
-        <div className="min-h-[295px]">
+        <div className="min-h-[400px]">
           {renderContent()}
         </div>
     </div>
