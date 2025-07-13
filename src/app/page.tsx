@@ -12,7 +12,7 @@ import { TodoItem } from '@/components/todo-item';
 import { Users, BookUser, Contact, Briefcase, PlusCircle, Circle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { notices, stats, students, teachers, parents, todoList as initialTodoList, academicEvents, schedule } from '@/lib/data';
-import { Calendar } from '@/components/ui/calendar';
+import { DashboardCalendar } from '@/components/dashboard-calendar';
 
 type Todo = (typeof initialTodoList)[0];
 
@@ -182,7 +182,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 gap-6">
         <Card>
-          <Calendar
+          <DashboardCalendar
             events={academicEvents}
             schedule={schedule}
             className="w-full"

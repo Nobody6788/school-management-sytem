@@ -79,11 +79,7 @@ export default function PersonalCalendarPage() {
     toast({ title: "Event Deleted", description: "The event has been removed from your calendar." });
   };
 
-  const eventDatesByType = {
-    holiday: events.filter(e => e.type === 'Holiday').map(e => new Date(e.date)),
-    exam: events.filter(e => e.type === 'Exam').map(e => new Date(e.date)),
-    event: events.filter(e => e.type === 'Event').map(e => new Date(e.date)),
-  };
+  const eventDates = events.map(e => new Date(e.date));
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -98,9 +94,13 @@ export default function PersonalCalendarPage() {
             selected={selectedDate}
             onSelect={setSelectedDate}
             modifiers={{
-              holiday: eventDatesByType.holiday,
-              exam: eventDatesByType.exam,
-              event: eventDatesByType.event,
+              hasEvent: eventDates,
+            }}
+             modifiersStyles={{
+              hasEvent: {
+                fontWeight: 'bold',
+                textDecoration: 'underline',
+              },
             }}
           />
         </CardContent>
