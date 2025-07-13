@@ -10,9 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TodoItem } from '@/components/todo-item';
-import { Users, BookUser, Contact, Briefcase, PlusCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, BookUser, Contact, Briefcase, PlusCircle, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { notices, stats, students, teachers, parents, todoList as initialTodoList, personalEvents } from '@/lib/data';
+import { notices, stats, students, teachers, parents, todoList as initialTodoList, personalEvents, schedule } from '@/lib/data';
 import { Calendar } from '@/components/ui/calendar';
 import { format, isSameDay, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 
@@ -29,8 +29,9 @@ const incomeData = [
   { name: 'Jul', income: 3490, expenses: 4300 },
 ];
 
-// Convert event dates for the calendar
 const eventDates = personalEvents.map(event => new Date(event.date + 'T00:00:00'));
+
+const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 export default function Dashboard() {
   const [todoList, setTodoList] = useState<Todo[]>(initialTodoList);
@@ -79,41 +80,87 @@ export default function Dashboard() {
             month={month}
             onMonthChange={setMonth}
             modifiers={{ hasEvent: eventDates }}
-            modifiersStyles={{ hasEvent: { position: 'relative' } }}
             components={{
               IconLeft: () => <ChevronLeft className="h-4 w-4" />,
               IconRight: () => <ChevronRight className="h-4 w-4" />,
               DayContent: (props) => {
                 const hasEvent = eventDates.some(d => isSameDay(d, props.date));
                 return (
-                  <div className="relative h-full w-full flex items-center justify-center">
+                  <>
                     {props.date.getDate()}
-                    {hasEvent && <div className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />}
-                  </div>
+                    {hasEvent && <div className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary" />}
+                  </>
                 )
               }
             }}
-            className="w-full"
           />
         );
-      case 'week':
-      case 'day':
-      case 'list':
+      case 'day': {
+        const selectedDay = date ? weekdays[date.getDay() === 0 ? 6 : date.getDay() - 1] : '';
+        const daySchedule = Object.entries(schedule).flatMap(([grade, slots]) => 
+            slots.map(slot => ({
+                time: slot.time,
+                grade,
+                subject: slot[selectedDay as keyof typeof slot]
+            })).filter(item => typeof item.subject === 'string')
+        ).sort((a,b) => a.time.localeCompare(b.time));
+
+        return (
+             <div className="p-4 min-h-[300px]">
+                 <h3 className="font-semibold text-lg mb-4">Schedule for {date ? format(date, 'PPPP') : 'selected day'}</h3>
+                 {daySchedule.length > 0 ? (
+                     <Table>
+                         <TableHeader><TableRow><TableHead>Time</TableHead><TableHead>Grade</TableHead><TableHead>Subject</TableHead></TableRow></TableHeader>
+                         <TableBody>
+                             {daySchedule.map((item, index) => (
+                                 <TableRow key={index}><TableCell>{item.time}</TableCell><TableCell>{item.grade}</TableCell><TableCell>{item.subject}</TableCell></TableRow>
+                             ))}
+                         </TableBody>
+                     </Table>
+                 ) : <p className="text-center text-muted-foreground pt-16">No classes scheduled for this day.</p>}
+             </div>
+        )
+      }
+      case 'week': {
+        const weekSchedule = weekdays.slice(0, 5).map(day => ({
+            day: day.charAt(0).toUpperCase() + day.slice(1),
+            schedule: Object.entries(schedule).flatMap(([grade, slots]) => 
+                slots.map(slot => ({
+                    time: slot.time,
+                    grade,
+                    subject: slot[day as keyof typeof slot]
+                })).filter(item => typeof item.subject === 'string' && item.subject !== 'Study Hall' && item.subject !== 'Physical Ed.')
+            ).sort((a, b) => a.time.localeCompare(b.time))
+        }));
+
+        return (
+             <div className="p-4 min-h-[300px] max-h-[500px] overflow-y-auto">
+                 {weekSchedule.map(dayInfo => (
+                     <div key={dayInfo.day} className="mb-6">
+                         <h3 className="font-semibold text-lg border-b pb-2 mb-2">{dayInfo.day}</h3>
+                         {dayInfo.schedule.length > 0 ? (
+                            <ul className="space-y-1 text-sm">
+                                {dayInfo.schedule.map((item, index) => (
+                                    <li key={index} className="flex gap-4">
+                                        <span className="w-24 text-muted-foreground">{item.time}</span>
+                                        <span className="w-28 font-medium">{item.grade}</span>
+                                        <span>{item.subject}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                         ) : <p className="text-sm text-muted-foreground">No classes scheduled.</p>}
+                     </div>
+                 ))}
+             </div>
+        )
+      }
+      case 'list': {
         const filteredEvents = personalEvents
           .map(e => ({ ...e, dateObj: new Date(e.date + 'T00:00:00') }))
-          .filter(e => {
-            if (calendarView === 'day' && date) return isSameDay(e.dateObj, date);
-            if (calendarView === 'week' && date) {
-              const start = startOfWeek(date);
-              const end = endOfWeek(date);
-              return isWithinInterval(e.dateObj, { start, end });
-            }
-            return true; // For list view
-          })
           .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
         
         return (
-          <div className="p-4 min-h-[300px]">
+          <div className="p-4 min-h-[300px] max-h-[500px] overflow-y-auto">
             {filteredEvents.length > 0 ? (
               <ul className="space-y-3">
                 {filteredEvents.map(event => (
@@ -130,10 +177,11 @@ export default function Dashboard() {
                 ))}
               </ul>
             ) : (
-              <p className="text-center text-muted-foreground pt-16">No events for this selection.</p>
+              <p className="text-center text-muted-foreground pt-16">No events scheduled.</p>
             )}
           </div>
         );
+      }
       default:
         return null;
     }
@@ -270,7 +318,12 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl font-medium">{format(month, 'MMMM yyyy')}</CardTitle>
+            <div className="flex items-baseline gap-2">
+                <CardTitle className="text-xl font-medium">{format(month, 'MMMM yyyy')}</CardTitle>
+                <Link href="/calendar">
+                  <Button variant="link" className="p-0 h-auto text-sm">View Full Calendar</Button>
+                </Link>
+            </div>
             <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={handleTodayClick}>Today</Button>
                 <div className="flex items-center rounded-md border p-1">
@@ -290,4 +343,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
