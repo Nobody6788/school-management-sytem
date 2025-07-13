@@ -9,15 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TodoItem } from '@/components/todo-item';
-import { Users, BookUser, Contact, Briefcase, PlusCircle, ChevronLeft, ChevronRight, CalendarDays, Circle } from 'lucide-react';
+import { Users, BookUser, Contact, Briefcase, PlusCircle, Circle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { notices, stats, students, teachers, parents, todoList as initialTodoList, academicEvents, schedule } from '@/lib/data';
 import { Calendar } from '@/components/ui/calendar';
-import { format, isSameDay, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import type { CalendarView } from '@/components/ui/calendar';
 
 type Todo = (typeof initialTodoList)[0];
-type AcademicEvent = (typeof academicEvents)[0];
 
 const incomeData = [
   { name: 'Jan', income: 4000, expenses: 2400 },
@@ -33,6 +31,9 @@ export default function Dashboard() {
   const [todoList, setTodoList] = useState<Todo[]>(initialTodoList);
   const [newTodo, setNewTodo] = useState('');
   
+  const [month, setMonth] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<CalendarView>('month');
+
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTodo.trim()) {
@@ -188,8 +189,26 @@ export default function Dashboard() {
           <Calendar
             events={academicEvents}
             schedule={schedule}
+            month={month}
+            onMonthChange={setMonth}
+            view={calendarView}
+            onViewChange={setCalendarView}
             className="w-full"
           />
+           <CardFooter className="flex gap-x-4 gap-y-2 flex-wrap border-t p-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Circle className="h-3 w-3 text-red-500 fill-current" />
+                <span>Holiday</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Circle className="h-3 w-3 text-blue-500 fill-current" />
+                <span>Exam</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Circle className="h-3 w-3 text-yellow-500 fill-current" />
+                <span>Event</span>
+              </div>
+          </CardFooter>
         </Card>
       </div>
     </div>

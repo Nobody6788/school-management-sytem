@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { add, format, isSameDay, startOfWeek, endOfWeek, isWithinInterval } from "date-fns"
 
-type CalendarView = 'month' | 'week' | 'day' | 'list';
+export type CalendarView = 'month' | 'week' | 'day' | 'list';
 
 type AcademicEvent = { id: string; date: string; title: string; description: string; type: 'Holiday' | 'Exam' | 'Event' };
 type Schedule = Record<string, { time: string; [key: string]: string }[]>;
@@ -18,64 +18,9 @@ type Schedule = Record<string, { time: string; [key: string]: string }[]>;
 export type CalendarProps = DayPickerProps & {
     events?: AcademicEvent[];
     schedule?: Schedule;
+    view?: CalendarView;
+    onViewChange?: (view: CalendarView) => void;
 };
-
-function Caption(props: {
-  displayMonth: Date;
-  onMonthChange: (date: Date) => void;
-  view: CalendarView;
-  onViewChange: (view: CalendarView) => void;
-}) {
-  const handleMonthChange = (offset: number) => {
-    props.onMonthChange(add(props.displayMonth, { months: offset }));
-  };
-
-  const handleYearChange = (offset: number) => {
-    props.onMonthChange(add(props.displayMonth, { years: offset }));
-  };
-
-  return (
-    <div className="flex items-center justify-between p-2">
-      <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
-             <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(-1)}>
-                <ChevronsLeft />
-            </Button>
-            <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(-1)}>
-                <ChevronLeft />
-            </Button>
-          </div>
-           <Button variant="outline" size="sm" className="h-7" onClick={() => props.onMonthChange(new Date())}>
-            Today
-          </Button>
-          <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
-            <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(1)}>
-                <ChevronRight />
-            </Button>
-            <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(1)}>
-                <ChevronsRight />
-            </Button>
-          </div>
-      </div>
-
-      <h2 className="text-lg font-bold">{format(props.displayMonth, 'MMMM yyyy')}</h2>
-
-      <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
-        {(['month', 'week', 'day', 'list'] as CalendarView[]).map((v) => (
-          <Button
-            key={v}
-            variant={props.view === v ? 'default' : 'ghost'}
-            size="sm"
-            className="h-7 capitalize"
-            onClick={() => props.onViewChange(v)}
-          >
-            {v}
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 
 function Calendar({
@@ -84,10 +29,16 @@ function Calendar({
   showOutsideDays = true,
   events = [],
   schedule = {},
+  view: propView = 'month',
+  onViewChange: setPropView = () => {},
+  month: propMonth,
+  onMonthChange: setPropMonth,
   ...props
 }: CalendarProps) {
-  const [view, setView] = React.useState<CalendarView>('month');
-  const [month, setMonth] = React.useState(props.month || new Date());
+  const [internalMonth, setInternalMonth] = React.useState(props.month || new Date());
+  const month = propMonth || internalMonth;
+  const onMonthChange = setPropMonth || setInternalMonth;
+  
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
 
   const eventsByDate = React.useMemo(() => {
@@ -104,7 +55,7 @@ function Calendar({
 
   const handleDayClick = (day: Date) => {
     setSelectedDate(day);
-    setView('day');
+    setPropView('day');
   };
 
   const DayContent = (dayProps: DayProps) => {
@@ -127,7 +78,7 @@ function Calendar({
   
   const renderDayView = () => {
     if (!selectedDate) return <div className="p-4 text-center text-muted-foreground">No date selected.</div>;
-    const dayKey = format(selectedDate, 'eeee').toLowerCase(); // e.g., 'monday'
+    const dayKey = format(selectedDate, 'eeee').toLowerCase();
     
     const todaysSchedule = Object.entries(schedule).flatMap(([grade, slots]) => 
       slots.map(slot => ({
@@ -163,7 +114,7 @@ function Calendar({
                      </table>
                  </div>
             ) : (
-                <p className="text-muted-foreground text-sm">No classes scheduled for this day.</p>
+                dayEvents.length === 0 && <p className="text-muted-foreground text-sm">No classes scheduled for this day.</p>
             )}
             {dayEvents.length === 0 && todaysSchedule.length === 0 && (
                 <p className="text-muted-foreground">No classes or events scheduled for this day.</p>
@@ -175,7 +126,7 @@ function Calendar({
   const renderWeekView = () => {
     if (!selectedDate) return <div className="p-4 text-center text-muted-foreground">No date selected.</div>;
 
-    const start = startOfWeek(selectedDate, { weekStartsOn: 1 }); // Monday
+    const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
     const weekDays = Array.from({ length: 5 }, (_, i) => add(start, { days: i }));
     const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
@@ -230,53 +181,96 @@ function Calendar({
      )
   }
 
+  const CustomCaption = (captionProps: { displayMonth: Date }) => {
+    const handleMonthChange = (offset: number) => {
+      onMonthChange(add(captionProps.displayMonth, { months: offset }));
+    };
+  
+    const handleYearChange = (offset: number) => {
+      onMonthChange(add(captionProps.displayMonth, { years: offset }));
+    };
+  
+    return (
+      <div className="flex items-center justify-between p-2">
+        <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
+               <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(-1)}>
+                  <ChevronsLeft />
+              </Button>
+              <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(-1)}>
+                  <ChevronLeft />
+              </Button>
+            </div>
+             <Button variant="outline" size="sm" className="h-7" onClick={() => onMonthChange(new Date())}>
+              Today
+            </Button>
+            <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
+              <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleMonthChange(1)}>
+                  <ChevronRight />
+              </Button>
+              <Button variant="outline" size="icon" className="h-7 w-7 bg-background" onClick={() => handleYearChange(1)}>
+                  <ChevronsRight />
+              </Button>
+            </div>
+        </div>
+  
+        <h2 className="text-lg font-bold">{format(captionProps.displayMonth, 'MMMM yyyy')}</h2>
+  
+        <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
+          {(['month', 'week', 'day', 'list'] as CalendarView[]).map((v) => (
+            <Button
+              key={v}
+              variant={propView === v ? 'default' : 'ghost'}
+              size="sm"
+              className="h-7 capitalize"
+              onClick={() => setPropView(v)}
+            >
+              {v}
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
-        <Caption
-            displayMonth={month}
-            onMonthChange={setMonth}
-            view={view}
-            onViewChange={setView}
+        <DayPicker
+        showOutsideDays={showOutsideDays}
+        className={cn("p-0", className)}
+        classNames={{
+            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+            month: "space-y-4 w-full",
+            caption: "w-full",
+            caption_label: "hidden",
+            table: "w-full border-collapse space-y-1",
+            head_row: "flex w-full",
+            head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
+            row: "flex w-full mt-2",
+            cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
+            day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
+            day_selected:
+            "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+            day_today: "bg-accent text-accent-foreground",
+            day_outside: "day-outside text-muted-foreground opacity-50",
+            day_disabled: "text-muted-foreground opacity-50",
+            ...classNames,
+        }}
+        components={{
+            Caption: CustomCaption,
+            DayContent: DayContent,
+        }}
+        month={month}
+        onMonthChange={onMonthChange}
+        selected={selectedDate}
+        onDayClick={handleDayClick}
+        {...props}
         />
-        <Separator className="my-2" />
-        <div className="mt-2 min-h-[295px]">
-            {view === 'month' && (
-                <DayPicker
-                showOutsideDays={showOutsideDays}
-                className={cn("p-3", className)}
-                classNames={{
-                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                    month: "space-y-4 w-full",
-                    caption: "hidden", // We use a custom caption component
-                    caption_label: "hidden",
-                    table: "w-full border-collapse space-y-1",
-                    head_row: "flex w-full",
-                    head_cell:
-                    "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-                    row: "flex w-full mt-2",
-                    cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                    day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
-                    day_selected:
-                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                    day_today: "bg-accent text-accent-foreground",
-                    day_outside: "day-outside text-muted-foreground opacity-50",
-                    day_disabled: "text-muted-foreground opacity-50",
-                    ...classNames,
-                }}
-                components={{
-                    Caption: () => null, // Hide default caption, we use our own
-                    DayContent: DayContent,
-                }}
-                month={month}
-                onMonthChange={setMonth}
-                selected={selectedDate}
-                onDayClick={handleDayClick}
-                {...props}
-                />
-            )}
-            {view === 'day' && renderDayView()}
-            {view === 'week' && renderWeekView()}
-            {view === 'list' && renderListView()}
+        {propView !== 'month' && <Separator />}
+        <div className="min-h-[295px]">
+            {propView === 'day' && renderDayView()}
+            {propView === 'week' && renderWeekView()}
+            {propView === 'list' && renderListView()}
         </div>
     </div>
   );
