@@ -13,7 +13,6 @@ import { Users, BookUser, Contact, Briefcase, PlusCircle, Circle } from 'lucide-
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { notices, stats, students, teachers, parents, todoList as initialTodoList, academicEvents, schedule } from '@/lib/data';
 import { Calendar } from '@/components/ui/calendar';
-import type { CalendarView } from '@/components/ui/calendar';
 
 type Todo = (typeof initialTodoList)[0];
 
@@ -30,9 +29,6 @@ const incomeData = [
 export default function Dashboard() {
   const [todoList, setTodoList] = useState<Todo[]>(initialTodoList);
   const [newTodo, setNewTodo] = useState('');
-  
-  const [month, setMonth] = useState(new Date());
-  const [calendarView, setCalendarView] = useState<CalendarView>('month');
 
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,10 +185,6 @@ export default function Dashboard() {
           <Calendar
             events={academicEvents}
             schedule={schedule}
-            month={month}
-            onMonthChange={setMonth}
-            view={calendarView}
-            onViewChange={setCalendarView}
             className="w-full"
           />
            <CardFooter className="flex gap-x-4 gap-y-2 flex-wrap border-t p-4">

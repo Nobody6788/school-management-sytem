@@ -18,8 +18,6 @@ type Schedule = Record<string, { time: string; [key: string]: string }[]>;
 export type CalendarProps = DayPickerProps & {
     events?: AcademicEvent[];
     schedule?: Schedule;
-    view?: CalendarView;
-    onViewChange?: (view: CalendarView) => void;
 };
 
 
@@ -29,16 +27,10 @@ function Calendar({
   showOutsideDays = true,
   events = [],
   schedule = {},
-  view: propView = 'month',
-  onViewChange: setPropView = () => {},
-  month: propMonth,
-  onMonthChange: setPropMonth,
   ...props
 }: CalendarProps) {
-  const [internalMonth, setInternalMonth] = React.useState(props.month || new Date());
-  const month = propMonth || internalMonth;
-  const onMonthChange = setPropMonth || setInternalMonth;
-  
+  const [month, setMonth] = React.useState(props.month || new Date());
+  const [view, setView] = React.useState<CalendarView>('month');
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
 
   const eventsByDate = React.useMemo(() => {
@@ -55,7 +47,7 @@ function Calendar({
 
   const handleDayClick = (day: Date) => {
     setSelectedDate(day);
-    setPropView('day');
+    setView('day');
   };
 
   const DayContent = (dayProps: DayProps) => {
@@ -183,11 +175,11 @@ function Calendar({
 
   const CustomCaption = (captionProps: { displayMonth: Date }) => {
     const handleMonthChange = (offset: number) => {
-      onMonthChange(add(captionProps.displayMonth, { months: offset }));
+      setMonth(add(captionProps.displayMonth, { months: offset }));
     };
   
     const handleYearChange = (offset: number) => {
-      onMonthChange(add(captionProps.displayMonth, { years: offset }));
+      setMonth(add(captionProps.displayMonth, { years: offset }));
     };
   
     return (
@@ -201,7 +193,7 @@ function Calendar({
                   <ChevronLeft />
               </Button>
             </div>
-             <Button variant="outline" size="sm" className="h-7" onClick={() => onMonthChange(new Date())}>
+             <Button variant="outline" size="sm" className="h-7" onClick={() => setMonth(new Date())}>
               Today
             </Button>
             <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
@@ -220,10 +212,10 @@ function Calendar({
           {(['month', 'week', 'day', 'list'] as CalendarView[]).map((v) => (
             <Button
               key={v}
-              variant={propView === v ? 'default' : 'ghost'}
+              variant={view === v ? 'default' : 'ghost'}
               size="sm"
               className="h-7 capitalize"
-              onClick={() => setPropView(v)}
+              onClick={() => setView(v)}
             >
               {v}
             </Button>
@@ -235,43 +227,43 @@ function Calendar({
 
   return (
     <div className="w-full">
-        <DayPicker
+      <DayPicker
         showOutsideDays={showOutsideDays}
         className={cn("p-0", className)}
         classNames={{
-            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-            month: "space-y-4 w-full",
-            caption: "w-full",
-            caption_label: "hidden",
-            table: "w-full border-collapse space-y-1",
-            head_row: "flex w-full",
-            head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-            row: "flex w-full mt-2",
-            cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
-            day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
-            day_selected:
-            "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-            day_today: "bg-accent text-accent-foreground",
-            day_outside: "day-outside text-muted-foreground opacity-50",
-            day_disabled: "text-muted-foreground opacity-50",
-            ...classNames,
+          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+          month: "space-y-4 w-full",
+          caption: "w-full",
+          caption_label: "hidden",
+          table: "w-full border-collapse space-y-1",
+          head_row: "flex w-full",
+          head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
+          row: "flex w-full mt-2",
+          cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
+          day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
+          day_selected:
+          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+          day_today: "bg-accent text-accent-foreground",
+          day_outside: "day-outside text-muted-foreground opacity-50",
+          day_disabled: "text-muted-foreground opacity-50",
+          ...classNames,
         }}
         components={{
-            Caption: CustomCaption,
-            DayContent: DayContent,
+          Caption: CustomCaption,
+          DayContent: DayContent,
         }}
         month={month}
-        onMonthChange={onMonthChange}
+        onMonthChange={setMonth}
         selected={selectedDate}
         onDayClick={handleDayClick}
         {...props}
-        />
-        {propView !== 'month' && <Separator />}
-        <div className="min-h-[295px]">
-            {propView === 'day' && renderDayView()}
-            {propView === 'week' && renderWeekView()}
-            {propView === 'list' && renderListView()}
-        </div>
+      />
+      {view !== 'month' && <Separator />}
+      <div className="min-h-[295px]">
+          {view === 'day' && renderDayView()}
+          {view === 'week' && renderWeekView()}
+          {view === 'list' && renderListView()}
+      </div>
     </div>
   );
 }
