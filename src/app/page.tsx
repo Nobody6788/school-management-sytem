@@ -8,10 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TodoItem } from '@/components/todo-item';
-import { Users, BookUser, Contact, Briefcase, PlusCircle } from 'lucide-react';
+import { Users, BookUser, Contact, Briefcase, PlusCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { notices, stats, students, teachers, parents, todoList as initialTodoList, personalEvents } from '@/lib/data';
 import { Calendar } from '@/components/ui/calendar';
+import { format, isSameDay } from 'date-fns';
 
 type Todo = (typeof initialTodoList)[0];
 
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [todoList, setTodoList] = useState<Todo[]>(initialTodoList);
   const [newTodo, setNewTodo] = useState('');
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [month, setMonth] = useState(date || new Date());
   
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +57,12 @@ export default function Dashboard() {
   const handleDeleteTodo = (id: string) => {
     setTodoList(prev => prev.filter(todo => todo.id !== id));
   };
+  
+  const handleTodayClick = () => {
+    const today = new Date();
+    setDate(today);
+    setMonth(today);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -185,14 +193,25 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Calendar</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-xl font-medium">{format(month, 'MMMM yyyy')}</CardTitle>
+            <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handleTodayClick}>Today</Button>
+                <div className="flex items-center rounded-md border p-1">
+                    <Button variant="ghost" size="sm" className="h-7 px-2" disabled>Day</Button>
+                    <Button variant="ghost" size="sm" className="h-7 px-2" disabled>Week</Button>
+                    <Button variant="ghost" size="sm" className="h-7 px-2 bg-muted">Month</Button>
+                    <Button variant="ghost" size="sm" className="h-7 px-2" disabled>List</Button>
+                </div>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
              <Calendar
                 mode="single"
                 selected={date}
                 onSelect={setDate}
+                month={month}
+                onMonthChange={setMonth}
                 modifiers={{
                   hasEvent: eventDates,
                 }}
@@ -202,8 +221,10 @@ export default function Dashboard() {
                    }
                 }}
                 components={{
+                  IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+                  IconRight: () => <ChevronRight className="h-4 w-4" />,
                   DayContent: (props) => {
-                    const hasEvent = eventDates.some(d => d.getDate() === props.date.getDate() && d.getMonth() === props.date.getMonth() && d.getFullYear() === props.date.getFullYear());
+                    const hasEvent = eventDates.some(d => isSameDay(d, props.date));
                     return (
                       <div className="relative h-full w-full flex items-center justify-center">
                         {props.date.getDate()}
@@ -212,6 +233,7 @@ export default function Dashboard() {
                     )
                   }
                 }}
+                className="w-full"
              />
           </CardContent>
         </Card>
