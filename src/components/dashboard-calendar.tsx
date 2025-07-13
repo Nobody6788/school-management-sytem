@@ -101,10 +101,10 @@ function DashboardCalendar({
         <h2 className="text-lg font-bold">{format(month, 'MMMM yyyy')}</h2>
   
         <div className="flex items-center gap-1 rounded-md border bg-muted p-1">
-            <Button variant={view === 'month' ? 'default' : 'outline'} size="sm" className="h-7 bg-background" onClick={() => setView('month')}>month</Button>
-            <Button variant={view === 'week' ? 'default' : 'outline'} size="sm" className="h-7 bg-background" onClick={() => setView('week')}>week</Button>
-            <Button variant={view === 'day' ? 'default' : 'outline'} size="sm" className="h-7 bg-background" onClick={() => setView('day')}>day</Button>
-            <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" className="h-7 bg-background" onClick={() => setView('list')}>list</Button>
+            <Button variant={view === 'month' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('month')}>month</Button>
+            <Button variant={view === 'week' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('week')}>week</Button>
+            <Button variant={view === 'day' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('day')}>day</Button>
+            <Button variant={view === 'list' ? 'default' : 'outline'} size="sm" className="h-7" onClick={() => setView('list')}>list</Button>
         </div>
       </div>
     );
@@ -200,6 +200,49 @@ function DashboardCalendar({
     )
   };
 
+  const renderContent = () => {
+      switch (view) {
+          case 'month':
+              return (
+                  <DayPicker
+                      showOutsideDays
+                      className="p-0"
+                      classNames={{
+                          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                          month: "space-y-4 w-full",
+                          caption: "hidden",
+                          table: "w-full border-collapse space-y-1",
+                          head_row: "flex w-full",
+                          head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
+                          row: "flex w-full mt-2",
+                          cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
+                          day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
+                          day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                          day_today: "bg-accent text-accent-foreground",
+                          day_outside: "day-outside text-muted-foreground opacity-50",
+                          day_disabled: "text-muted-foreground opacity-50",
+                      }}
+                      components={{
+                          DayContent: DayContent,
+                      }}
+                      month={month}
+                      onMonthChange={setMonth}
+                      selected={selectedDate}
+                      onDayClick={handleDayClick}
+                      {...props}
+                  />
+              );
+          case 'week':
+              return renderWeekView();
+          case 'day':
+              return renderDayView();
+          case 'list':
+              return renderListView();
+          default:
+              return null;
+      }
+  };
+
 
   return (
     <div className={cn("w-full", className)}>
@@ -207,38 +250,7 @@ function DashboardCalendar({
         <Separator />
         
         <div className="min-h-[295px]">
-          {view === 'month' && (
-             <DayPicker
-                showOutsideDays
-                className="p-0"
-                classNames={{
-                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                    month: "space-y-4 w-full",
-                    caption: "hidden",
-                    table: "w-full border-collapse space-y-1",
-                    head_row: "flex w-full",
-                    head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-                    row: "flex w-full mt-2",
-                    cell: "h-auto p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                    day: "h-14 w-full p-1 font-normal aria-selected:opacity-100 rounded-md",
-                    day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                    day_today: "bg-accent text-accent-foreground",
-                    day_outside: "day-outside text-muted-foreground opacity-50",
-                    day_disabled: "text-muted-foreground opacity-50",
-                }}
-                components={{
-                    DayContent: DayContent,
-                }}
-                month={month}
-                onMonthChange={setMonth}
-                selected={selectedDate}
-                onDayClick={handleDayClick}
-                {...props}
-            />
-          )}
-          {view === 'day' && renderDayView()}
-          {view === 'week' && renderWeekView()}
-          {view === 'list' && renderListView()}
+          {renderContent()}
         </div>
     </div>
   );
@@ -246,5 +258,3 @@ function DashboardCalendar({
 DashboardCalendar.displayName = "DashboardCalendar"
 
 export { DashboardCalendar }
-
-    
