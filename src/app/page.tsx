@@ -181,12 +181,20 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <Card>
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle>School Calendar</CardTitle>
+            <CardDescription>View and manage academic events and schedules</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="w-full">
           <DashboardCalendar
             events={academicEvents}
             schedule={schedule}
             className="w-full"
           />
+            </div>
+          </CardContent>
         </Card>
       </div>
     </div>

@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  swcMinify: false,
+  reactStrictMode: false,
+  experimental: {
+    optimizeCss: false,
+    optimizePackageImports: ['react-day-picker'],
+  },
 };
 
 export default nextConfig;
